@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // This is the same as Accelerometer.cs but with added control features
 // Good to use with Unity Remote app to control a game object
@@ -14,7 +13,7 @@ public class DebugAccelerometer : MonoBehaviour
     [Header("Movement Settings")]
 
     public float horizontalSpeed = 250.0f;
-    public float verticalSpeed = 2.50f;
+    public float jumpForce = 2.50f;
     public float triggerJumpEventThreshold = 0.1f;
 
     private float lastJumpTime = 0.0f;
@@ -38,19 +37,47 @@ public class DebugAccelerometer : MonoBehaviour
     public bool lockY = true;
     public bool lockZ = false;
 
+    private bool ready = false;
+
     private void Start()
+    {
+        if (Accelerometer.current == null)
+        {
+            Debug.LogError("No accelerometer found! If using Unity Remote debugging this is fine");
+
+#if UNITY_EDITOR
+            Debug.Log("You can ignore these errors stating NullReference - ugly I know");
+            Debug.Log("It's because the Unity Remote App is loading and the editor is running as well.");
+            ready = true;
+            Setup();
+#endif
+            return;
+        }
+        else
+        {
+            InputSystem.EnableDevice(Accelerometer.current);
+            Setup();
+            ready = true;
+        }
+    }
+
+    private void Setup()
     {
         float accelerometerUpdateInterval = 1 / accelerometerUpdateIntervalHz;
 
         lowPassFilterFactor = accelerometerUpdateInterval / lowPassKernelWidthInSeconds;
-        lowPassValue = Input.acceleration;
+
+        lowPassValue = Accelerometer.current.acceleration.ReadValue();
 
         lastJumpTime = Time.time;
     }
 
     private void Update()
     {
-        Vector3 acc = GetAccelerometerValue();
+        if (!ready)
+            return;
+
+        Vector3 acc = Accelerometer.current.acceleration.ReadValue();
 
         // low pass filter
         acc = LowPassFilterAccelerometer(lowPassValue, acc);
@@ -79,7 +106,7 @@ public class DebugAccelerometer : MonoBehaviour
 
         // draw ray before deltaTime
         Debug.DrawRay(objectOfInterest.position, Vector3.right * dir.x * horizontalSpeed, Color.red);
-        Debug.DrawRay(objectOfInterest.position, Vector3.up * dir.y * verticalSpeed, Color.green);
+        Debug.DrawRay(objectOfInterest.position, Vector3.up * dir.y * jumpForce, Color.green);
         Debug.DrawRay(objectOfInterest.position, Vector3.forward * dir.z * horizontalSpeed, Color.blue);
 
         // demo of jump event!
@@ -90,7 +117,7 @@ public class DebugAccelerometer : MonoBehaviour
                 return;
 
             Debug.Log("Jump!");
-            rb.AddForce(Vector3.up * verticalSpeed, ForceMode.Impulse);
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             lastJumpTime = Time.time;
         }
 
@@ -107,23 +134,6 @@ public class DebugAccelerometer : MonoBehaviour
         if (lockZ) dir.z = 0;
 
         objectOfInterest.Translate(dir);
-    }
-
-    Vector3 GetAccelerometerValue()
-    {
-        Vector3 acc = Vector3.zero;
-        float period = 0.0f;
-
-        foreach (AccelerationEvent evnt in Input.accelerationEvents)
-        {
-            acc += evnt.acceleration * evnt.deltaTime;
-            period += evnt.deltaTime;
-        }
-        if (period > 0)
-        {
-            acc *= 1.0f / period;
-        }
-        return acc;
     }
 
     Vector3 LowPassFilterAccelerometer(Vector3 prevValue, Vector3 acc)

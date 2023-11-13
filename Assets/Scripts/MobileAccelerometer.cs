@@ -1,8 +1,10 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // With much help from https://docs.unity3d.com/2022.3/Documentation/Manual/MobileInput.html
-public class Accelerometer : MonoBehaviour
+// and this: https://docs.unity3d.com/Packages/com.unity.inputsystem@1.7/api/UnityEngine.InputSystem.Accelerometer.html
+public class MobileAccelerometer : MonoBehaviour
 {
     public float triggerJumpEventThreshold = 0.1f;
     private float lastJumpTime = 0.0f;
@@ -25,20 +27,50 @@ public class Accelerometer : MonoBehaviour
     public TextMeshProUGUI xText;
     public TextMeshProUGUI yText;
     public TextMeshProUGUI zText;
+    public TextMeshProUGUI jumpText;
+
+    private bool ready = false;
+    private int jumps = 0;
 
     private void Start()
+    {
+        if (Accelerometer.current == null)
+        {
+            Debug.LogError("No accelerometer found! If using Unity Remote debugging this is fine");
+
+#if UNITY_EDITOR
+            Debug.Log("You can ignore these errors stating NullReference - ugly I know");
+            Debug.Log("It's because the Unity Remote App is loading and the editor is running as well.");
+            ready = true;
+            Setup();
+#endif
+            return;
+        }
+        else
+        {
+            InputSystem.EnableDevice(Accelerometer.current);
+            Setup();
+            ready = true;
+        }
+    }
+
+    private void Setup()
     {
         float accelerometerUpdateInterval = 1 / accelerometerUpdateIntervalHz;
 
         lowPassFilterFactor = accelerometerUpdateInterval / lowPassKernelWidthInSeconds;
-        lowPassValue = Input.acceleration;
+
+        lowPassValue = Accelerometer.current.acceleration.ReadValue();
 
         lastJumpTime = Time.time;
     }
 
     private void Update()
     {
-        Vector3 accData = GetAccelerometerValue();
+        if (!ready)
+            return;
+
+        Vector3 accData = Accelerometer.current.acceleration.ReadValue();
 
         // low pass filter
         accData = LowPassFilterAccelerometer(lowPassValue, accData);
@@ -57,9 +89,13 @@ public class Accelerometer : MonoBehaviour
         {
             // only jump once per second
             if (lastJumpTime + 1f > Time.time)
+            {
                 return;
+            }
 
             Debug.Log("Jump!");
+            jumps++;
+            jumpText.text = $"Jump counter: {jumps}";
             lastJumpTime = Time.time;
         }
 
@@ -69,23 +105,6 @@ public class Accelerometer : MonoBehaviour
         xText.text = "X: " + acc.x.ToString("F6");
         yText.text = "Y: " + acc.y.ToString("F6");
         zText.text = "Z: " + acc.z.ToString("F6");
-    }
-
-    Vector3 GetAccelerometerValue()
-    {
-        Vector3 acc = Vector3.zero;
-        float period = 0.0f;
-
-        foreach (AccelerationEvent evnt in Input.accelerationEvents)
-        {
-            acc += evnt.acceleration * evnt.deltaTime;
-            period += evnt.deltaTime;
-        }
-        if (period > 0)
-        {
-            acc *= 1.0f / period;
-        }
-        return acc;
     }
 
     Vector3 LowPassFilterAccelerometer(Vector3 prevValue, Vector3 acc)
