@@ -173,7 +173,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 }
 
                 int2 iuv = int2(_SnowDeformationAreaPixels * _snowUv);
-                float snowHighestDepthMeters = _SnowDepthCm * 10e-3f;
+                float snowHighestDepthMeters = _SnowDepthCm * 1e-2f;
 
                 // sample nearest pixels in the deformation map
                 float4 snowSamples;
@@ -196,7 +196,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             *********************************/
             struct Attributes
             {
-                float4 vertex : POSITION;
+                float4 position : POSITION;
                 float3 normal : NORMAL;
                 float4 tangent : TANGENT;
                 float2 texCoord : TEXCOORD0;
@@ -215,7 +215,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             *********************************/
             struct ControlPoint
             {
-                float4 vertex : INTERNALTESSPOS;
+                float4 position : INTERNALTESSPOS;
                 float3 normal : NORMAL;
                 float4 tangent : TANGENT;
                 float2 texCoord : TEXCOORD0;
@@ -284,7 +284,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(varyings);
 
                 // Compute initial world space attributes
-                float3 positionWS = TransformObjectToWorld(_attributes.vertex.xyz);
+                float3 positionWS = TransformObjectToWorld(_attributes.position.xyz);
                 float3 normalWS = TransformObjectToWorldDir(_attributes.normal.xyz);
                 float3 tangentWS = TransformObjectToWorldDir(_attributes.tangent.xyz);
                 float3 bitangentWS = normalize(cross(normalWS, tangentWS) * _attributes.tangent.w);
@@ -297,7 +297,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 // Sample snow noise map
                 float2 noiseUv = positionWS.xz * _NoiseUvScale + _NoiseUvOffset;
                 float depthOffset = 2.f * SAMPLE_TEXTURE2D_LOD(_NoiseMap, sampler_NoiseMap, noiseUv, 0).r - 1.f;
-                float snowHighestDepthMeters = (_SnowDepthCm + _NoiseWeight * depthOffset) * 10e-3f;
+                float snowHighestDepthMeters = (_SnowDepthCm + _NoiseWeight * depthOffset) * 1e-2f;
 
                 // Displace vertex up to current snow depth
                 positionWS += normalWS * snowHighestDepthMeters * saturate(1.f - snowDeformation);
@@ -306,7 +306,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                     // Reconstruct normal using finite difference
                     float3 normalTS = Snow_ReconstructNormal(snowUv);
 
-                    // convert to world space
+                    // Convert to world space
                     normalWS = Utils_TanToWorld(normalTS, tangentWS, bitangentWS, normalWS);
                     normalWS = normalize(normalWS);
                 #endif
@@ -374,7 +374,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 UNITY_SETUP_INSTANCE_ID(_attributes);
                 UNITY_TRANSFER_INSTANCE_ID(_attributes, controlPoint);
 
-                controlPoint.vertex = _attributes.vertex;
+                controlPoint.position = _attributes.position;
                 controlPoint.normal = _attributes.normal;
                 controlPoint.tangent = _attributes.tangent;
                 controlPoint.texCoord = _attributes.texCoord;
@@ -396,17 +396,17 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             TessellationFactors ComputeTriangleEdgeTessellationFactors(float3 _triVertexFactors)
             {
                 TessellationFactors tessFactors;
-                tessFactors.edge[0] = 0.5 * (_triVertexFactors.y + _triVertexFactors.z);
-                tessFactors.edge[1] = 0.5 * (_triVertexFactors.x + _triVertexFactors.z);
-                tessFactors.edge[2] = 0.5 * (_triVertexFactors.x + _triVertexFactors.y);
+                tessFactors.edge[0] = 0.5f * (_triVertexFactors.y + _triVertexFactors.z);
+                tessFactors.edge[1] = 0.5f * (_triVertexFactors.x + _triVertexFactors.z);
+                tessFactors.edge[2] = 0.5f * (_triVertexFactors.x + _triVertexFactors.y);
 
                 tessFactors.inside = (_triVertexFactors.x + _triVertexFactors.y + _triVertexFactors.z) / 3.0f;
                 return tessFactors;
             }
 
-            float GetNormalizedDistanceToCam(float4 _vertex, float _minDistance, float _maxDistance)
+            float GetNormalizedDistanceToCam(float4 _localPos, float _minDistance, float _maxDistance)
             {
-                float3 positionWS = mul(unity_ObjectToWorld, _vertex).xyz;
+                float3 positionWS = mul(unity_ObjectToWorld, _localPos).xyz;
                 float distanceWS = distance(positionWS, _WorldSpaceCameraPos);
 
                 float normalizedDistance = 1.0f - (distanceWS - _minDistance) / (_maxDistance - _minDistance);
@@ -433,7 +433,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 float _tessellation = _TessellationFactor * max(max(scale.x, scale.y), scale.z);
 
                 return DistanceBasedTessellation(
-                    _patch[0].vertex, _patch[1].vertex, _patch[2].vertex, 
+                    _patch[0].position, _patch[1].position, _patch[2].position, 
                     minDistance, maxDistance, _tessellation);
             }
 
@@ -451,21 +451,21 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             Varyings DomainTessellation(TessellationFactors _factors, OutputPatch<ControlPoint, 3> _patch, float3 _barycentricCoord : SV_DomainLocation)
             {
                 Attributes attributes = (Attributes)0;
+                UNITY_TRANSFER_INSTANCE_ID(_patch[0], attributes);
 
                 #define Interpolate(fieldName) attributes.fieldName =   \
                             _patch[0].fieldName * _barycentricCoord.x + \
                             _patch[1].fieldName * _barycentricCoord.y + \
                             _patch[2].fieldName * _barycentricCoord.z;  \
 
-                Interpolate(vertex)
-                Interpolate(normal)
-                Interpolate(tangent)
+                Interpolate(position)
                 Interpolate(texCoord)
 
+                Interpolate(normal)
                 attributes.normal = normalize(attributes.normal);
-                attributes.tangent = normalize(attributes.tangent);
 
-                UNITY_TRANSFER_INSTANCE_ID(_patch[0], attributes);
+                Interpolate(tangent)
+                attributes.tangent = normalize(attributes.tangent);
 
                 #if defined(LIGHTMAP_ON)
                     Interpolate(staticLightmapUV);
@@ -474,8 +474,6 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 #if defined(DYNAMICLIGHTMAP_ON)
                     Interpolate(dynamicLightmapUV);
                 #endif
-
-
 
                 return VertexDefault(attributes);
             }
@@ -489,7 +487,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                     UNITY_SETUP_INSTANCE_ID(_varyings);
                     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(_varyings);
 
-                    // renormalize word space directions
+                    // re-normalize word space directions
                     float3 tangentWS = SafeNormalize(_varyings.tangentWS);
                     float3 bitangentWS = SafeNormalize(_varyings.bitangentWS);
                     float3 normalWS = SafeNormalize(_varyings.normalWS);

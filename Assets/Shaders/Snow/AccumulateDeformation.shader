@@ -32,6 +32,7 @@ Shader "Universal Render Pipeline/Custom/AccumulateDeformation"
             *********************************/
             TEXTURE2D(_PrevSnowDeformationMap);
             SAMPLER(sampler_PrevSnowDeformationMap);
+
             TEXTURE2D(_RawSnowDeformationMap);
             SAMPLER(sampler_RawSnowDeformationMap);
 
