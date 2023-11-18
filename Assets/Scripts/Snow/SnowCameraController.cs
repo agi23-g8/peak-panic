@@ -26,7 +26,7 @@ public class SnowCameraController : MonoBehaviour
         if (cameraTarget != null)
         {
             // update camera position
-            transform.position = new Vector3(cameraTarget.position.x, 0f, cameraTarget.position.z);
+            transform.position = cameraTarget.position;
         }
 
         currentCamOrigin = transform.position;

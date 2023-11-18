@@ -288,14 +288,16 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 float3 normalWS = TransformObjectToWorldDir(_attributes.normal.xyz);
                 float3 tangentWS = TransformObjectToWorldDir(_attributes.tangent.xyz);
                 float3 bitangentWS = normalize(cross(normalWS, tangentWS) * _attributes.tangent.w);
-                float2 worldUv = positionWS.xz * _WorldUvScale + _WorldUvOffset;
+
+                float3 positionTS = Utils_WorldToTan(positionWS, tangentWS, bitangentWS, bitangentWS);
+                float2 worldUv = positionTS.xy * _WorldUvScale + _WorldUvOffset;
 
                 // Sample snow deformation map
                 float2 snowUv = Snow_WorldToUv(positionWS);
                 float snowDeformation = Snow_SampleDeformation(snowUv);
 
                 // Sample snow noise map
-                float2 noiseUv = positionWS.xz * _NoiseUvScale + _NoiseUvOffset;
+                float2 noiseUv = positionTS.xy * _NoiseUvScale + _NoiseUvOffset;
                 float depthOffset = 2.f * SAMPLE_TEXTURE2D_LOD(_NoiseMap, sampler_NoiseMap, noiseUv, 0).r - 1.f;
                 float snowHighestDepthMeters = (_SnowDepthCm + _NoiseWeight * depthOffset) * 1e-2f;
 
