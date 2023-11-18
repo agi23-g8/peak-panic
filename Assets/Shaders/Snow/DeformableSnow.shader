@@ -26,8 +26,8 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
 
         [Space]
         [Header(## Terrain Tessellation)][Space]
-        _TessellationFactor("Tessellation Factor", Range(0, 50)) = 15
-        _TessellationDistance("Tessellation Distance (m)", Range(1, 60)) = 30
+        _TessellationFactor("Tessellation Factor", Range(0.1, 100)) = 15
+        _TessellationDistance("Tessellation Distance (m)", Range(1, 100)) = 30
 
         // unity lighting
         [HideInInspector][NoScaleOffset]unity_Lightmaps("unity_Lightmaps", 2DArray) = "" {}
@@ -131,6 +131,12 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             bool Utils_CheckUvBounds(in float2 _uv)
             {
                 return (_uv.x >= 0 && _uv.x <= 1 && _uv.y >= 0 && _uv.y <= 1);     
+            }
+
+            float2 Utils_GetWorldUv(in float3 _positionWS, in float _scale, in float _offset)
+            {
+                // assuming Y-axis is the world up
+                return _positionWS.xz * _scale + _offset;
             }
 
             float3 Utils_GetTransformScale(in float4x4 _transform)
@@ -288,16 +294,14 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 float3 normalWS = TransformObjectToWorldDir(_attributes.normal.xyz);
                 float3 tangentWS = TransformObjectToWorldDir(_attributes.tangent.xyz);
                 float3 bitangentWS = normalize(cross(normalWS, tangentWS) * _attributes.tangent.w);
-
-                float3 positionTS = Utils_WorldToTan(positionWS, tangentWS, bitangentWS, bitangentWS);
-                float2 worldUv = positionTS.xy * _WorldUvScale + _WorldUvOffset;
+                float2 worldUv = Utils_GetWorldUv(positionWS, _WorldUvScale, _WorldUvOffset);
 
                 // Sample snow deformation map
                 float2 snowUv = Snow_WorldToUv(positionWS);
                 float snowDeformation = Snow_SampleDeformation(snowUv);
 
                 // Sample snow noise map
-                float2 noiseUv = positionTS.xy * _NoiseUvScale + _NoiseUvOffset;
+                float2 noiseUv = Utils_GetWorldUv(positionWS, _NoiseUvScale, _NoiseUvOffset);
                 float depthOffset = 2.f * SAMPLE_TEXTURE2D_LOD(_NoiseMap, sampler_NoiseMap, noiseUv, 0).r - 1.f;
                 float snowHighestDepthMeters = (_SnowDepthCm + _NoiseWeight * depthOffset) * 1e-2f;
 

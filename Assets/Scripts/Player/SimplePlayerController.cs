@@ -10,10 +10,13 @@ public class SimplePlayerController : MonoBehaviour
     private Rigidbody rigidBody;
     private Vector3 currentVelocity;
     private Vector3 currentSlopeNormal;
+    private int terrainLayer;
 
     void Start()
     {
         mainCamera = Camera.main;
+        terrainLayer = 1 << LayerMask.NameToLayer("Terrain");
+
         currentVelocity = Vector3.zero;
         currentSlopeNormal = Vector3.up;
 
@@ -42,6 +45,13 @@ public class SimplePlayerController : MonoBehaviour
         // Calculate the movement direction based on camera orientation
         Vector3 movement = (cameraForward * verticalInput + cameraRight * horizontalInput).normalized;
 
+        // Evaluate the normal of the terrain slope
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position,  Vector3.down, out hit, maxRaycastDistance, terrainLayer))
+        {
+            currentSlopeNormal = hit.normal;
+        }
+
         // Project the movement onto the current slope
         movement = Vector3.ProjectOnPlane(movement, currentSlopeNormal);
 
@@ -49,20 +59,16 @@ public class SimplePlayerController : MonoBehaviour
         currentVelocity = Vector3.SmoothDamp(currentVelocity, speed * movement, ref currentVelocity, slipperiness);
         transform.Translate(currentVelocity * Time.deltaTime, Space.World);
 
+        // Rotate the player to align with the slope
+        Quaternion slopeRotation = Quaternion.FromToRotation(transform.up, currentSlopeNormal) * transform.rotation;
+        transform.rotation = Quaternion.Slerp(transform.rotation, slopeRotation, 0.1f);
+
         // Rotate the player to face the direction of movement
         if (movement.magnitude > 0)
         {
-            Quaternion toRotation = Quaternion.LookRotation(movement, Vector3.up);
-            transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, 0.1f);
+            Quaternion inputRotation = Quaternion.LookRotation(movement, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, inputRotation, 0.1f);
         }
-    }
 
-    void FixedUpdate()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position,  Vector3.down, out hit, maxRaycastDistance))
-        {
-            currentSlopeNormal = hit.normal;
-        }
     }
 }
