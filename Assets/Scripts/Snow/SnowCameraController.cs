@@ -5,38 +5,38 @@ using UnityEngine;
 public class SnowCameraController : MonoBehaviour
 {
     [SerializeField]
-    Transform cameraTarget;
+    [Tooltip("The target transform that the camera will follow.")]
+    private Transform m_target;
 
-    private Camera snowCamera;
-    private Vector3 previousCamOrigin;
-    private Vector3 currentCamOrigin;
+    private Camera m_snowCamera;
+    private Vector3 m_previousCamOrigin;
+    private Vector3 m_currentCamOrigin;
 
     void Start()
     {
         // Get the Camera component from the GameObject
-        snowCamera = GetComponent<Camera>();
-        Debug.Assert(snowCamera != null, "SnowCameraController script must be attached to a GameObject with a Camera component.");
+        m_snowCamera = GetComponent<Camera>();
+        Debug.Assert(m_snowCamera != null, "SnowCameraController script must be attached to a GameObject with a Camera component.");
     }
 
     private void LateUpdate()
     {
-        previousCamOrigin = transform.position;
-        Shader.SetGlobalVector("_PrevSnowDeformationOrigin", previousCamOrigin);
+        m_previousCamOrigin = transform.position;
+        Shader.SetGlobalVector("_PrevSnowDeformationOrigin", m_previousCamOrigin);
 
-        if (cameraTarget != null)
+        if (m_target != null)
         {
             // update camera position
-            transform.position = cameraTarget.position;
+            transform.position = m_target.position;
         }
 
-        currentCamOrigin = transform.position;
-        Shader.SetGlobalVector("_CurSnowDeformationOrigin", currentCamOrigin);
+        m_currentCamOrigin = transform.position;
+        Shader.SetGlobalVector("_CurSnowDeformationOrigin", m_currentCamOrigin);
 
-        float deformationAreaMeters = 2 * snowCamera.orthographicSize;
+        float deformationAreaMeters = 2 * m_snowCamera.orthographicSize;
         Shader.SetGlobalFloat("_SnowDeformationAreaMeters", deformationAreaMeters);
 
-        Vector3 originOffset = (currentCamOrigin - previousCamOrigin) / deformationAreaMeters;
+        Vector3 originOffset = (m_currentCamOrigin - m_previousCamOrigin) / deformationAreaMeters;
         Shader.SetGlobalVector("_SnowDeformationOriginOffset", originOffset);
     }
-
 }

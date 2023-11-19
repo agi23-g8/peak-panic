@@ -265,7 +265,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5dc92c70f12bea49985fb83b6eee4d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraTarget: {fileID: 2115887176}
+  m_target: {fileID: 2115887176}
 --- !u!1 &306458022
 GameObject:
   m_ObjectHideFlags: 0
@@ -1327,13 +1327,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1319269814}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2645359, y: -0, z: -0, w: 0.9643759}
-  m_LocalPosition: {x: -0.12, y: 6.61, z: -5.77}
+  m_LocalRotation: {x: 0.2588191, y: 0, z: 0, w: 0.9659258}
+  m_LocalPosition: {x: -0.1, y: 6.6, z: -5.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 30.679, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}
 --- !u!114 &1319269818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1390,10 +1390,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e443d8069252b8a429a775358c88fa7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 2115887176}
-  sensitivity: 20
-  blendFactor: 5
-  distance: 6
+  m_target: {fileID: 2115887176}
+  m_sensitivity: 50
+  m_blendFactor: 3
+  m_distanceToTarget: 5
 --- !u!1 &1527338665
 GameObject:
   m_ObjectHideFlags: 0
@@ -2160,7 +2160,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 3000
+    maxNumParticles: 2000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -2228,7 +2228,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 160, y: 160, z: 4}
+    m_Scale: {x: 100, y: 100, z: 4}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -2426,7 +2426,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 500
+      scalar: 400
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -6640,7 +6640,7 @@ Transform:
   m_GameObject: {fileID: 2115887171}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.029, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -6662,9 +6662,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5fc9a563ea29994a8454f348a9b0e87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  slipperiness: 0.1
-  maxRaycastDistance: 1.5
+  m_speed: 5
+  m_slipperiness: 0.1
+  m_adherenceOffset: 1.25
+  m_adherenceThreshold: 2
 --- !u!54 &2115887179
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -24,8 +24,8 @@ public class SnowDeformationFeature : ScriptableRendererFeature
 
         public CompositingPass(string _profilerTag, Material _accumulateMaterial)
         {
-            this.m_profilerTag = _profilerTag;
-            this.m_accumulateMaterial = _accumulateMaterial;
+            m_profilerTag = _profilerTag;
+            m_accumulateMaterial = _accumulateMaterial;
         }
 
         public void SetMultiTargets(RenderTexture _prev, RenderTexture _curr)
@@ -88,9 +88,11 @@ public class SnowDeformationFeature : ScriptableRendererFeature
 
     // Settings, must be named "settings" to be shown in the Render Features inspector
     public CompositingSettings settings = new CompositingSettings();
+
     // The actual rendering pass where rendering commands happen
     CompositingPass m_compositingPass;
 
+    // The material used to produce the final deformation map
     Material m_accumulateMaterial;
 
     public override void Create()
@@ -115,5 +117,3 @@ public class SnowDeformationFeature : ScriptableRendererFeature
         _renderer.EnqueuePass(m_compositingPass);
     }
 }
-
-
