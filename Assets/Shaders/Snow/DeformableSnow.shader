@@ -13,11 +13,11 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
 
         [Space]
         [Header(## Snow Depth)][Space]
-        _SnowDepthCm("Snow Depth (cm)", Range(0, 100)) = 20
-        [NoScaleOffset]_NoiseMap("Noise Map", 2D) = "gray" {}
+        _SnowBaseDepth("Snow Base Depth (cm)", Range(0, 100)) = 20
+        [NoScaleOffset]_NoiseDepthMap("Noise Depth Map", 2D) = "gray" {}
+        _NoiseIntensity("Noise Intensity", Range(0, 100)) = 1.0
         _NoiseUvScale("Noise UV Scale", Range(0, 1)) = 0.5
         _NoiseUvOffset("Noise UV Offset", Float) = 0.0
-        _NoiseWeight("Noise Weight", Range(0, 100)) = 1.0
 
         [Space]
         [Header(## Snow Deformation)][Space]
@@ -76,8 +76,8 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             TEXTURE2D(_CavityMap);
             SAMPLER(sampler_CavityMap);
 
-            TEXTURE2D(_NoiseMap);
-            SAMPLER(sampler_NoiseMap);
+            TEXTURE2D(_NoiseDepthMap);
+            SAMPLER(sampler_NoiseDepthMap);
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _SnowTrackTint;
@@ -87,8 +87,8 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 float _TessellationFactor;
                 float _TessellationDistance;
 
-                float _SnowDepthCm;
-                float _NoiseWeight;
+                float _SnowBaseDepth;
+                float _NoiseIntensity;
                 float _NoiseUvScale;
                 float _NoiseUvOffset;
             CBUFFER_END
@@ -96,15 +96,10 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             /*********************************
             *        Global resources        *
             *********************************/
-            TEXTURE2D(_PrevSnowDeformationMap);
-            SAMPLER(sampler_PrevSnowDeformationMap);
-
             TEXTURE2D(_CurSnowDeformationMap);
             SAMPLER(sampler_CurSnowDeformationMap);
 
-            float3 _PrevSnowDeformationOrigin;
             float3 _CurSnowDeformationOrigin;
-
             float _SnowDeformationAreaMeters;
             float _SnowDeformationAreaPixels;
 
@@ -139,6 +134,16 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 return _positionWS.xz * _scale + _offset;
             }
 
+            float Utils_GetDistanceBasedTessellation(float3 _positionWS)
+            {
+                float minDistance = 0.2f;
+                float maxDistance = _TessellationDistance;
+
+                float distanceToCam = distance(_positionWS, _WorldSpaceCameraPos);
+                float invNormalizedDistance = 1.0f - (distanceToCam - minDistance) / (maxDistance - minDistance);
+                return clamp(invNormalizedDistance, 0.01f, 1.0f);
+            }
+
             float3 Utils_GetTransformScale(in float4x4 _transform)
             {
                 float3 scale;
@@ -150,7 +155,20 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
 
             float2 Snow_WorldToUv(in float3 _positionWS)
             {
-                return 0.5f + (_positionWS.xz - _PrevSnowDeformationOrigin.xz) / _SnowDeformationAreaMeters;
+                return 0.5f + (_positionWS.xz - _CurSnowDeformationOrigin.xz) / _SnowDeformationAreaMeters;
+            }
+
+            float Snow_SampleDepthNoise(in float3 _positionWS)
+            {
+                // sample noise map based on world UVs to ensure continuity of the snow depth across the surface
+                float2 noiseUv = Utils_GetWorldUv(_positionWS, _NoiseUvScale, _NoiseUvOffset);
+                float noiseDepth = SAMPLE_TEXTURE2D_LOD(_NoiseDepthMap, sampler_NoiseDepthMap, noiseUv, 0).r;
+
+                // re-range depth in [-noiseIntensity, noiseIntensity]
+                noiseDepth = 2.f * noiseDepth - 1.f;
+                noiseDepth *= _NoiseIntensity;
+
+                return noiseDepth;
             }
 
             float Snow_SampleDeformation(in float2 _snowUv)
@@ -179,7 +197,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 }
 
                 int2 iuv = int2(_SnowDeformationAreaPixels * _snowUv);
-                float snowHighestDepthMeters = _SnowDepthCm * 1e-2f;
+                float snowInitialDepthMeters = _SnowBaseDepth * 1e-2f;
 
                 // sample nearest pixels in the deformation map
                 float4 snowSamples;
@@ -190,8 +208,8 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
 
                 // reconstruct tangent space normal using finite difference
                 float3 normalTS;
-                normalTS.x = (snowSamples[1] - snowSamples[0]) * snowHighestDepthMeters;
-                normalTS.y = (snowSamples[3] - snowSamples[2]) * snowHighestDepthMeters;
+                normalTS.x = (snowSamples[1] - snowSamples[0]) * snowInitialDepthMeters;
+                normalTS.y = (snowSamples[3] - snowSamples[2]) * snowInitialDepthMeters;
                 normalTS.z = 2.f * _SnowDeformationAreaMeters / _SnowDeformationAreaPixels;
 
                 return normalize(normalTS);
@@ -296,17 +314,24 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 float3 bitangentWS = normalize(cross(normalWS, tangentWS) * _attributes.tangent.w);
                 float2 worldUv = Utils_GetWorldUv(positionWS, _WorldUvScale, _WorldUvOffset);
 
+                // Gradually reduce vertex displacement as the tessellation level decreases to avoid popping artifacts
+                float tessLevel = Utils_GetDistanceBasedTessellation(positionWS);
+
                 // Sample snow deformation map
                 float2 snowUv = Snow_WorldToUv(positionWS);
-                float snowDeformation = Snow_SampleDeformation(snowUv);
+                float snowDeformation = tessLevel * Snow_SampleDeformation(snowUv);
+                snowDeformation *= tessLevel;
 
-                // Sample snow noise map
-                float2 noiseUv = Utils_GetWorldUv(positionWS, _NoiseUvScale, _NoiseUvOffset);
-                float depthOffset = 2.f * SAMPLE_TEXTURE2D_LOD(_NoiseMap, sampler_NoiseMap, noiseUv, 0).r - 1.f;
-                float snowHighestDepthMeters = (_SnowDepthCm + _NoiseWeight * depthOffset) * 1e-2f;
+                // Sample snow depth noise map
+                float snowDepthOffset = Snow_SampleDepthNoise(positionWS);
+                snowDepthOffset *= tessLevel;
 
-                // Displace vertex up to current snow depth
-                positionWS += normalWS * snowHighestDepthMeters * saturate(1.f - snowDeformation);
+                // Deduce current depth of the snow cover
+                float snowCoverDepth = (_SnowBaseDepth + snowDepthOffset) * 1e-2f;
+                snowCoverDepth *= saturate(1.f - snowDeformation);
+
+                // Displace vertex up to the current snow depth
+                positionWS += normalWS * snowCoverDepth;
 
                 #if defined(RECONSTRUCT_NORMALS)
                     // Reconstruct normal using finite difference
@@ -399,48 +424,27 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             /*********************************
             *     Tessellation shaders       *
             *********************************/
-            TessellationFactors ComputeTriangleEdgeTessellationFactors(float3 _triVertexFactors)
-            {
-                TessellationFactors tessFactors;
-                tessFactors.edge[0] = 0.5f * (_triVertexFactors.y + _triVertexFactors.z);
-                tessFactors.edge[1] = 0.5f * (_triVertexFactors.x + _triVertexFactors.z);
-                tessFactors.edge[2] = 0.5f * (_triVertexFactors.x + _triVertexFactors.y);
-
-                tessFactors.inside = (_triVertexFactors.x + _triVertexFactors.y + _triVertexFactors.z) / 3.0f;
-                return tessFactors;
-            }
-
-            float GetNormalizedDistanceToCam(float4 _localPos, float _minDistance, float _maxDistance)
-            {
-                float3 positionWS = mul(unity_ObjectToWorld, _localPos).xyz;
-                float distanceWS = distance(positionWS, _WorldSpaceCameraPos);
-
-                float normalizedDistance = 1.0f - (distanceWS - _minDistance) / (_maxDistance - _minDistance);
-                return clamp(normalizedDistance, 0.01f, 1.0f);
-            }
-
-            TessellationFactors DistanceBasedTessellation(float4 _v0, float4 _v1, float4 _v2, float _minDistance, float _maxDistance, float _tessellation)
-            {
-                float3 factors;
-                factors.x = GetNormalizedDistanceToCam(_v0, _minDistance, _maxDistance);
-                factors.y = GetNormalizedDistanceToCam(_v1, _minDistance, _maxDistance);
-                factors.z = GetNormalizedDistanceToCam(_v2, _minDistance, _maxDistance);
-
-                return ComputeTriangleEdgeTessellationFactors(_tessellation * factors);
-            }
-
             TessellationFactors PatchConstantFunction(InputPatch<ControlPoint, 3> _patch)
             {
-                float minDistance = 0.2f;
-                float maxDistance = _TessellationDistance;
+                // Compute distance-based tessellation factors
+                float3 factors;
+                factors.x = Utils_GetDistanceBasedTessellation(mul(unity_ObjectToWorld, _patch[0].position).xyz);
+                factors.y = Utils_GetDistanceBasedTessellation(mul(unity_ObjectToWorld, _patch[1].position).xyz);
+                factors.z = Utils_GetDistanceBasedTessellation(mul(unity_ObjectToWorld, _patch[2].position).xyz);
 
                 // Scale the tessellation factor based on the transform scale
                 float3 scale = Utils_GetTransformScale(unity_ObjectToWorld);
-                float _tessellation = _TessellationFactor * max(max(scale.x, scale.y), scale.z);
+                factors *= max(max(scale.x, scale.y), scale.z);
+                factors *= _TessellationFactor;
 
-                return DistanceBasedTessellation(
-                    _patch[0].position, _patch[1].position, _patch[2].position, 
-                    minDistance, maxDistance, _tessellation);
+                // Deduce the final tessellation factors
+                TessellationFactors tessFactors;
+                tessFactors.edge[0] = 0.5f * (factors.y + factors.z);
+                tessFactors.edge[1] = 0.5f * (factors.x + factors.z);
+                tessFactors.edge[2] = 0.5f * (factors.x + factors.y);
+
+                tessFactors.inside = (factors.x + factors.y + factors.z) / 3.0f;
+                return tessFactors;
             }
 
             [domain("tri")]
