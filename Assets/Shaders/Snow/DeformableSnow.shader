@@ -314,6 +314,20 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 float3 bitangentWS = normalize(cross(normalWS, tangentWS) * _attributes.tangent.w);
                 float2 worldUv = Utils_GetWorldUv(positionWS, _WorldUvScale, _WorldUvOffset);
 
+                #if defined(DEPTH_ONLY_OUT)
+                {
+                    // Just use the base depth in depth only pass
+                    float snowCoverDepth = _SnowBaseDepth * 1e-2f;
+
+                    // Displace vertex up to the current snow depth
+                    positionWS += normalWS * snowCoverDepth;
+
+                    // Eearly discards in depth only pass
+                    varyings.positionCS = TransformWorldToHClip(positionWS);
+                    return varyings;
+                }
+                #endif
+
                 // Gradually reduce vertex displacement as the tessellation level decreases to avoid popping artifacts
                 float tessLevel = Utils_GetDistanceBasedTessellation(positionWS);
 
@@ -491,6 +505,12 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
             /*********************************
             *        Fragment shaders        *
             *********************************/
+
+            half4 FragmentDefault(Varyings _varyings) : SV_TARGET
+            {
+                return 0;
+            }
+
             #if defined(GBUFFER_OUT)
                 FragmentOutput FragmentGBuffer(Varyings _varyings)
                 {
@@ -585,13 +605,6 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 }
             #endif
 
-            #if defined(SHADOW_OUT)
-                half4 FragmentShadow(Varyings _varyings) : SV_TARGET
-                {
-                    return 0;
-                }
-            #endif
-
         ENDHLSL
 
         // SHADOW PASS
@@ -617,7 +630,7 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 #pragma vertex VertexTessellation
                 #pragma hull HullTessellation
                 #pragma domain DomainTessellation
-                #pragma fragment FragmentShadow
+                #pragma fragment FragmentDefault
 
                 // -------------------------------------
                 // Unity keywords
@@ -676,6 +689,33 @@ Shader "Universal Render Pipeline/Custom/DeformableSnow"
                 #pragma multi_compile GBUFFER_OUT
                 #pragma multi_compile_vertex _ RECONSTRUCT_NORMALS
                 #pragma multi_compile_domain _ RECONSTRUCT_NORMALS
+            ENDHLSL
+        }
+
+        // DEPTH ONLY PASS
+        Pass
+        {
+            Name "DepthOnly"
+            Tags { "LightMode" = "DepthOnly" }
+
+            // -------------------------------------
+            // Fixed states
+            ZWrite On
+            ZTest LEqual
+            Cull Back
+            ColorMask 0
+
+            HLSLPROGRAM
+                #pragma target 2.0
+
+                // -------------------------------------
+                // Shader Stages
+                #pragma vertex VertexDefault
+                #pragma fragment FragmentDefault
+
+                // -------------------------------------
+                // Custom keywords
+                #pragma multi_compile DEPTH_ONLY_OUT
             ENDHLSL
         }
     }

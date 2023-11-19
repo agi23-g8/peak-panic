@@ -11,23 +11,6 @@ Shader "Universal Render Pipeline/Custom/AccumulateDeformation"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Common.hlsl"
 
             /*********************************
-            *        Vertex attributes       *
-            *********************************/
-            struct Attributes
-            {
-                uint vertexID : SV_VertexID;
-            };
-
-            /*********************************
-            *         Shader varyings        *
-            *********************************/
-            struct Varyings
-            {
-                float4 pos : SV_POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            /*********************************
             *        Global resources        *
             *********************************/
             TEXTURE2D(_PrevSnowDeformationMap);
@@ -53,6 +36,23 @@ Shader "Universal Render Pipeline/Custom/AccumulateDeformation"
                 float2(-1.0, -1.0), float2( 0.0, -1.0), float2( 1.0, -1.0),
                 float2(-1.0,  0.0), float2( 0.0,  0.0), float2( 1.0,  0.0),
                 float2(-1.0,  1.0), float2( 0.0,  1.0), float2( 1.0,  1.0),
+            };
+
+            /*********************************
+            *        Vertex attributes       *
+            *********************************/
+            struct Attributes
+            {
+                uint vertexID : SV_VertexID;
+            };
+
+            /*********************************
+            *         Shader varyings        *
+            *********************************/
+            struct Varyings
+            {
+                float4 pos : SV_POSITION;
+                float2 uv : TEXCOORD0;
             };
 
             /*********************************

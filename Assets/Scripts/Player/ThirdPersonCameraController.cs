@@ -18,7 +18,7 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     [SerializeField]
     [Range(0.1f, 40f)]
-    [Tooltip("Distance from the camera to the target.")]
+    [Tooltip("Distance from the camera to the target, expressed in meters.")]
     private float m_distanceToTarget = 5f;
 
     private Vector3 m_targetPosition;

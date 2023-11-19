@@ -41,7 +41,7 @@ public class SnowDeformationFeature : ScriptableRendererFeature
         // The render pipeline will ensure target setup and clearing happens in a performant manner.
         public override void OnCameraSetup(CommandBuffer _cmd, ref RenderingData _renderingData)
         {
-            // get the raw deformation map from rendering data
+            // get the raw deformation map from rendering data (color target)
             m_rawDeformationMap = _renderingData.cameraData.renderer.cameraColorTargetHandle;
         }
 
