@@ -8,7 +8,7 @@ public class SnowDeformationFeature : ScriptableRendererFeature
     public class CompositingSettings
     {
         public string profilerTag = "Accumulate Deformation";
-        public Shader accumulateShader;
+        public Material compositingMaterial;
 
         public RenderTexture currentDeformationMap;
         public RenderTexture previousDeformationMap;
@@ -20,12 +20,12 @@ public class SnowDeformationFeature : ScriptableRendererFeature
         RTHandle m_rawDeformationMap;
         RenderTexture m_currentDeformationMap;
         RenderTexture m_previousDeformationMap;
-        Material m_accumulateMaterial;
+        Material m_compositingMaterial;
 
-        public CompositingPass(string _profilerTag, Material _accumulateMaterial)
+        public CompositingPass(string _profilerTag, Material _compositingMaterial)
         {
             m_profilerTag = _profilerTag;
-            m_accumulateMaterial = _accumulateMaterial;
+            m_compositingMaterial = _compositingMaterial;
         }
 
         public void SetMultiTargets(RenderTexture _prev, RenderTexture _curr)
@@ -58,14 +58,12 @@ public class SnowDeformationFeature : ScriptableRendererFeature
             Shader.SetGlobalTexture("_RawSnowDeformationMap", m_rawDeformationMap.rt);
             Shader.SetGlobalFloat("_SnowDeformationAreaPixels", m_rawDeformationMap.rt.width);
 
-            // copy previous deformation state
-            //Blitter.BlitCameraTexture(cmd, m_currentDeformationMap, m_previousDeformationMap, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
+            // copy previous deformation map
             cmd.Blit(m_currentDeformationMap, m_previousDeformationMap);
             Shader.SetGlobalTexture("_PrevSnowDeformationMap", m_previousDeformationMap);
 
-            // accumulate raw and previous deformation state
-            //Blitter.BlitCameraTexture(cmd, null, m_currentDeformationMap, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store, m_accumulateMaterial, 0);
-            cmd.Blit(null, m_currentDeformationMap, m_accumulateMaterial);
+            // accumulate raw and previous deformation map
+            cmd.Blit(null, m_currentDeformationMap, m_compositingMaterial);
             Shader.SetGlobalTexture("_CurSnowDeformationMap", m_currentDeformationMap);
 
             // tell ScriptableRenderContext to execute the commands
@@ -80,10 +78,6 @@ public class SnowDeformationFeature : ScriptableRendererFeature
         public override void OnCameraCleanup(CommandBuffer _cmd)
         {
         }
-
-        public void Dispose()
-        {
-        }
     }
 
     // Settings, must be named "settings" to be shown in the Render Features inspector
@@ -93,21 +87,14 @@ public class SnowDeformationFeature : ScriptableRendererFeature
     CompositingPass m_compositingPass;
 
     // The material used to produce the final deformation map
-    Material m_accumulateMaterial;
+    Material m_compositingMaterial;
 
     public override void Create()
     {
-        m_accumulateMaterial = CoreUtils.CreateEngineMaterial(settings.accumulateShader);
-        m_compositingPass = new CompositingPass(settings.profilerTag, m_accumulateMaterial);
+        m_compositingPass = new CompositingPass(settings.profilerTag, settings.compositingMaterial);
 
         // Configures where the render pass should be injected.
         m_compositingPass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        CoreUtils.Destroy(m_accumulateMaterial);
-        m_compositingPass.Dispose();
     }
 
     // This method is called when setting up the renderer once per-camera.

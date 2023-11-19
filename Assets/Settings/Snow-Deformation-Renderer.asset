@@ -58,7 +58,8 @@ MonoBehaviour:
   m_Active: 1
   settings:
     profilerTag: AccumulateDeformation
-    accumulateShader: {fileID: 4800000, guid: fa755dc43fe073e41bf233e1aec9082d, type: 3}
+    compositingMaterial: {fileID: 2100000, guid: 917220b4d89c5a44eb7ae1e70cd57561,
+      type: 2}
     currentDeformationMap: {fileID: 8400000, guid: ae04cc294dffdcb4581e245b028a28ac,
       type: 2}
     previousDeformationMap: {fileID: 8400000, guid: 1510f6ebed35e424293465c0963500f9,

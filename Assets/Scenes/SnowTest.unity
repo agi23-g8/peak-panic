@@ -6771,7 +6771,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5fc9a563ea29994a8454f348a9b0e87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_speed: 5
+  m_speed: 7
   m_slipperiness: 0.1
   m_adherenceOffset: 1.25
   m_adherenceThreshold: 2

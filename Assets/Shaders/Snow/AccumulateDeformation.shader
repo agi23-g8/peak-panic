@@ -1,4 +1,4 @@
-Shader "Universal Render Pipeline/Custom/AccumulateDeformation"
+Shader "Snow/AccumulateDeformation"
 {
     SubShader
     {

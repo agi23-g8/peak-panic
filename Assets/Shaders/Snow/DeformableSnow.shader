@@ -1,4 +1,4 @@
-Shader "Universal Render Pipeline/Custom/DeformableSnow"
+Shader "Snow/SnowyTerrain"
 {
     Properties
     {

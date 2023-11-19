@@ -74,7 +74,7 @@ public class SkierPlayerController : MonoBehaviour
         // Project the movement onto the slope
         movement = Vector3.ProjectOnPlane(movement, m_currentSlopeNormal);
 
-        // Move the player using SmoothDamp() to simulate the m_slipperiness of snow
+        // Move the player using SmoothDamp() to simulate the slipperiness of snow
         m_currentVelocity = Vector3.SmoothDamp(m_currentVelocity, m_speed * movement, ref m_currentVelocity, m_slipperiness);
         transform.Translate(m_currentVelocity * Time.deltaTime, Space.World);
 

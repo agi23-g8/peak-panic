@@ -1,4 +1,4 @@
-Shader "Universal Render Pipeline/Custom/RawDeformation"
+Shader "Snow/RawDeformation"
 {
     Properties
     {

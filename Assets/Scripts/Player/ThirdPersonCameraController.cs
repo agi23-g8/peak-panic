@@ -40,7 +40,7 @@ public class ThirdPersonCameraController : MonoBehaviour
         float rotationX = verticalRotate * m_sensitivity;
         float rotationY = horizontalRotate * m_sensitivity;
 
-        // Update the orientation to rotation around the target
+        // Update the orientation to rotate around the target
         UpdateRotation(rotationX, rotationY);
 
         // Update the position to follow the target
@@ -52,7 +52,6 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     private void UpdateRotation(float _xInput, float _yInput)
     {
-        // Update the target rotation based on input
         m_targetRotation = Quaternion.Euler(
             Mathf.Clamp(transform.rotation.eulerAngles.x + _xInput, 0f, 89f),
             transform.rotation.eulerAngles.y + _yInput, 
@@ -61,7 +60,6 @@ public class ThirdPersonCameraController : MonoBehaviour
 
     private void UpdatePosition(Vector3 _focusPosition)
     {
-        // Update the target position based on input
         m_targetPosition = _focusPosition - transform.forward * m_distanceToTarget;
     }
 
