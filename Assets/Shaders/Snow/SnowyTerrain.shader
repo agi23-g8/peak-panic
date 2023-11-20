@@ -136,12 +136,13 @@ Shader "Snow/SnowyTerrain"
 
             float Utils_GetDistanceBasedTessellation(float3 _positionWS)
             {
-                float minDistance = 0.2f;
-                float maxDistance = _TessellationDistance;
+                const float minDistance = 0.2f;
+                const float maxDistance = _TessellationDistance;
 
-                float distanceToCam = distance(_positionWS, _WorldSpaceCameraPos);
-                float invNormalizedDistance = 1.0f - (distanceToCam - minDistance) / (maxDistance - minDistance);
-                return clamp(invNormalizedDistance, 0.01f, 1.0f);
+                float distanceToOrigin = distance(_positionWS, _CurSnowDeformationOrigin);
+                float distanceRatio = 1.f - (distanceToOrigin - minDistance) / (maxDistance - minDistance);
+
+                return clamp(distanceRatio, 0.01f, 1.0f);
             }
 
             float3 Utils_GetTransformScale(in float4x4 _transform)
@@ -155,6 +156,7 @@ Shader "Snow/SnowyTerrain"
 
             float2 Snow_WorldToUv(in float3 _positionWS)
             {
+                // assuming Y-axis is the world up
                 return 0.5f + (_positionWS.xz - _CurSnowDeformationOrigin.xz) / _SnowDeformationAreaMeters;
             }
 
@@ -328,12 +330,13 @@ Shader "Snow/SnowyTerrain"
                 }
                 #endif
 
-                // Gradually reduce vertex displacement as the tessellation level decreases to avoid popping artifacts
+                // Gradually reduce vertex displacement effects as the
+                // tessellation level decreases to avoid popping artifacts
                 float tessLevel = Utils_GetDistanceBasedTessellation(positionWS);
 
                 // Sample snow deformation map
                 float2 snowUv = Snow_WorldToUv(positionWS);
-                float snowDeformation = tessLevel * Snow_SampleDeformation(snowUv);
+                float snowDeformation = Snow_SampleDeformation(snowUv);
                 snowDeformation *= tessLevel;
 
                 // Sample snow depth noise map

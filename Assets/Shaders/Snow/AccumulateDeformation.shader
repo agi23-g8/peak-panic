@@ -1,5 +1,11 @@
 Shader "Snow/AccumulateDeformation"
 {
+    Properties
+    {
+        [Toggle(FILTER_DEFORMATION)] _FilterDeformation("Filter Deformation", Float) = 0
+        _FilterRadius("Filter Radius (px)", Range(1.0, 10.0)) = 1.0
+    }
+
     SubShader
     {
         LOD 0
@@ -39,6 +45,11 @@ Shader "Snow/AccumulateDeformation"
             };
 
             /*********************************
+            *       Material resources       *
+            *********************************/
+            uniform float _FilterRadius;
+
+            /*********************************
             *        Vertex attributes       *
             *********************************/
             struct Attributes
@@ -71,15 +82,19 @@ Shader "Snow/AccumulateDeformation"
             *********************************/
             float4 FragmentAccumulation(Varyings _varyings) : SV_TARGET
             {
-                // float rawDeformation = 0.f;
-                // for (int i = 0; i < 9; ++i)
-                // {
-                //     const float2 offsetUv = _varyings.uv + 5.f * kOffsets[i] / _SnowDeformationAreaPixels;
-                //     rawDeformation += SAMPLE_TEXTURE2D_LOD(_RawSnowDeformationMap, sampler_RawSnowDeformationMap, offsetUv, 0).r * kWeights[i];
-                // }
-
                 // 1 - sample current raw deformation
-                float rawDeformation = SAMPLE_TEXTURE2D_LOD(_RawSnowDeformationMap, sampler_RawSnowDeformationMap, _varyings.uv, 0).r;
+                float rawDeformation = 0.f;
+
+                #if defined(FILTER_DEFORMATION)
+                    for (int i = 0; i < 9; ++i)
+                    {
+                        // perform a gaussian downsample to smooth vertex displacement
+                        const float2 offsetUv = _varyings.uv + _FilterRadius * kOffsets[i] / _SnowDeformationAreaPixels;
+                        rawDeformation += SAMPLE_TEXTURE2D_LOD(_RawSnowDeformationMap, sampler_RawSnowDeformationMap, offsetUv, 0).r * kWeights[i];
+                    }
+                #else
+                    rawDeformation = SAMPLE_TEXTURE2D_LOD(_RawSnowDeformationMap, sampler_RawSnowDeformationMap, _varyings.uv, 0).r;
+                #endif
 
                 // 2 - sample previous blended deformation
                 float prevDeformation = 0.f;
@@ -115,6 +130,10 @@ Shader "Snow/AccumulateDeformation"
                 // Shader Stages
                 #pragma vertex VertexFullscreen
                 #pragma fragment FragmentAccumulation
+
+                // -------------------------------------
+                // Custom Keywords
+                #pragma multi_compile_fragment _ FILTER_DEFORMATION
             ENDHLSL
         }
     }

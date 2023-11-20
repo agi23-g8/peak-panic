@@ -1,9 +1,5 @@
 Shader "Snow/RawDeformation"
 {
-    Properties
-    {
-    }
-
     SubShader
     {
         LOD 0
