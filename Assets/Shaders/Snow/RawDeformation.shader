@@ -81,7 +81,7 @@ Shader "Snow/RawDeformation"
             // Fixed states
             ZWrite Off
             ZTest LEqual
-            Cull Back
+            Cull Front
 
             HLSLPROGRAM
                 #pragma target 2.0

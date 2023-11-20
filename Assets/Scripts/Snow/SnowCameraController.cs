@@ -51,10 +51,6 @@ public class SnowCameraController : MonoBehaviour
             {
                 camPosition.y = hit.point.y + m_heightOffset;
             }
-            else
-            {
-                Debug.LogWarning("The raycast to the terrain failed for snow camera.");
-            }
 
             transform.position = camPosition;
         }
