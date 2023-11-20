@@ -19,9 +19,13 @@ public class MobileAccelerometer : MonoBehaviour
     private float lowPassFilterFactor;
     private Vector3 lowPassValue = Vector3.zero;
 
+    [Header("Accelerometer vector")]
+
+    [Tooltip("The current acceleration of the device. Send this to the server")]
+    public Vector3 acceleration;
+
     [Header("Debug")]
 
-    public Vector3 d_accel;
     public float d_sqrMagnitude;
     
     public TextMeshProUGUI xText;
@@ -36,7 +40,7 @@ public class MobileAccelerometer : MonoBehaviour
     {
         if (Accelerometer.current == null)
         {
-            Debug.LogError("No accelerometer found! If using Unity Remote debugging this is fine");
+            Debug.LogError("No accelerometer found! If you are using Unity Remote debugging this is fine. If you don't want to test the Accelerometer: disable this Game Object.");
 
 #if UNITY_EDITOR
             Debug.Log("You can ignore these errors stating NullReference - ugly I know");
@@ -75,17 +79,17 @@ public class MobileAccelerometer : MonoBehaviour
         // low pass filter
         accData = LowPassFilterAccelerometer(lowPassValue, accData);
 
-        Vector3 acc = Vector3.zero;
+        acceleration = Vector3.zero;
 
         // we assume that the device is held parallel to the ground and the home button
         // is closest to the player. Example: lay the phone flat on a table in front of you
-        // and you should be able to read on it normally. (not rotated)
-        acc.x = accData.y;
-        acc.y = -accData.z;
-        acc.z = -accData.x;
+        // and you should be able to read on it normally. Portrait mode.
+        acceleration.x = accData.y;
+        acceleration.y = -accData.z;
+        acceleration.z = -accData.x;
 
         // demo of jump event!
-        if (acc.y > triggerJumpEventThreshold)
+        if (acceleration.y > triggerJumpEventThreshold)
         {
             // only jump once per second
             if (lastJumpTime + 1f > Time.time)
@@ -93,23 +97,36 @@ public class MobileAccelerometer : MonoBehaviour
                 return;
             }
 
+            // here you could trigger a networked jump event
+
             Debug.Log("Jump!");
             jumps++;
-            jumpText.text = $"Jump counter: {jumps}";
             lastJumpTime = Time.time;
         }
 
-        d_accel = acc;
-        d_sqrMagnitude = acc.sqrMagnitude;
+        d_sqrMagnitude = acceleration.sqrMagnitude;
 
-        xText.text = "X: " + acc.x.ToString("F6");
-        yText.text = "Y: " + acc.y.ToString("F6");
-        zText.text = "Z: " + acc.z.ToString("F6");
+        if (xText == null || yText == null || zText == null || jumpText == null)
+            return;
+
+        xText.text = "X: " + acceleration.x.ToString("F6");
+        yText.text = "Y: " + acceleration.y.ToString("F6");
+        zText.text = "Z: " + acceleration.z.ToString("F6");
+        jumpText.text = $"Jump counter: {jumps}";
     }
 
     Vector3 LowPassFilterAccelerometer(Vector3 prevValue, Vector3 acc)
     {
         Vector3 newValue = Vector3.Lerp(prevValue, acc, lowPassFilterFactor);
         return newValue;
+    }
+
+    /// <summary>
+    /// Get the current acceleration of the device's sensor.
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 GetAcceleration()
+    {
+        return acceleration;
     }
 }
