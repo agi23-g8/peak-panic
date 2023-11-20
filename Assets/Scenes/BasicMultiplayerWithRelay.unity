@@ -658,6 +658,7 @@ GameObject:
   - component: {fileID: 334368955}
   - component: {fileID: 334368954}
   - component: {fileID: 334368953}
+  - component: {fileID: 334368956}
   m_Layer: 5
   m_Name: JoinCodeText
   m_TagString: Untagged
@@ -821,6 +822,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 334368951}
   m_CullTransparentMesh: 1
+--- !u!114 &334368956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334368951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showHtmlElement: 0
 --- !u!1 &400228889
 GameObject:
   m_ObjectHideFlags: 0
@@ -1046,7 +1060,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &474957378
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1063,7 +1077,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -173}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &474957379
@@ -2389,6 +2403,7 @@ GameObject:
   - component: {fileID: 1456525652}
   - component: {fileID: 1456525654}
   - component: {fileID: 1456525653}
+  - component: {fileID: 1456525655}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -2512,6 +2527,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1456525651}
   m_CullTransparentMesh: 1
+--- !u!114 &1456525655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1456525651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc33a39070010f94fb1c2dd721c1286d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showHtmlElement: 0
 --- !u!1 &1728875722
 GameObject:
   m_ObjectHideFlags: 0
