@@ -401,7 +401,7 @@ MonoBehaviour:
   m_rotateSpeed: 5
   m_inertiaFactor: 30
   m_sidewaysDrag: 50
-  m_phoneInputs: {fileID: 347071411}
+  m_accelerometer: {fileID: 347071411}
 --- !u!65 &21793048
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1025,8 +1025,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7712acee3665d474592088ba36ed47e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_value: {x: 0, y: 0, z: 0}
   m_isReady: 0
+  m_value: {x: 0, y: 0, z: 0}
   m_accelerometerRefreshRate: 100
   m_lowPassKernelWidth: 0.3
   m_inputMultiplier: 25
@@ -6076,7 +6076,6 @@ MonoBehaviour:
   accelerometerUpdateIntervalHz: 100
   lowPassKernelWidthInSeconds: 0.3
   d_accel: {x: 0, y: 0, z: 0}
-  debugValue: {x: 0, y: 0, z: 0}
   d_sqrMagnitude: 0
   lockX: 0
   lockY: 1

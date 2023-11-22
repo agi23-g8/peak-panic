@@ -58,8 +58,8 @@ public class PhysicsSkierController : MonoBehaviour
             float slopeDeltaHeight = Mathf.Max(0f, hit.distance - m_skierHeight);
             m_rigidBody.MovePosition(transform.position - transform.up * slopeDeltaHeight);
 
-            float verticalInput = 0f;
             float horizontalInput = 0f;
+            float verticalInput = 0f;
 
             if (m_accelerometer != null && m_accelerometer.IsReady())
             {
