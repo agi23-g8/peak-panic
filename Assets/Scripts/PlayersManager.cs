@@ -26,4 +26,5 @@ public class PlayersManager : NetworkSingleton<PlayersManager>
                 playersInGame.Value--;
         };
     }
+
 }

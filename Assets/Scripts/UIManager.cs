@@ -87,14 +87,5 @@ public class UIManager : Singleton<UIManager>
             hasServerStarted = true;
         };
 
-        // executePhysicsButton.onClick.AddListener(() =>
-        // {
-        //     if (!hasServerStarted)
-        //     {
-        //         Logger.Instance.LogWarning("Server has not started...");
-        //         return;
-        //     }
-        //     SpawnerControl.Instance.SpawnObjects();
-        // });
     }
 }
