@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Netcode;
@@ -71,10 +72,12 @@ public class UIScriptManager : MonoBehaviour
 
         joinButtonText.text = "Connecting...";
 
-        Connect(name, code);
+        Connect(code);
+
+        StartCoroutine(SetNetworkPlayerName(name));
     }
 
-    private async void Connect(string name, string code)
+    private async void Connect(string code)
     {
 
         if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(code))
@@ -97,4 +100,22 @@ public class UIScriptManager : MonoBehaviour
             joinButtonText.text = "Join";
         }
     }
+
+    IEnumerator SetNetworkPlayerName(string name)
+    {
+        // when the network player prefab is spawned, set the name
+
+        // search for a game object with the NetworkPlayer component
+        GameObject networkPlayer = null;
+        while (networkPlayer == null)
+        {
+            networkPlayer = GameObject.FindObjectOfType<NetworkPlayer>()?.gameObject;
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        // set the name
+        networkPlayer.GetComponent<NetworkPlayer>().SetPlayerName(name);
+    }
+
+
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ServerManager : MonoBehaviour
+public class ServerManager : Singleton<ServerManager>
 {
 
     [SerializeField]
@@ -72,10 +72,16 @@ public class ServerManager : MonoBehaviour
     {
         // START GAME when all players have joined
 
-
         // TODO: Update the actual player object with the network player
+        // Something like:
         // foreach (GameObject player in playerMap.Values)
         //      player.GetComponent<Player>().SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
+        // Then, in Player.cs, you can do:
+        // void SetNetworkPlayer(NetworkPlayer networkPlayer)
+        // {
+        //     networkPlayer.accelerometer.OnValueChanged += OnAccelerometerChanged;
+        //     networkPlayer.playerName.OnValueChanged += OnPlayerNameChanged;
+        // }
     }
 
     // Update is called once per frame

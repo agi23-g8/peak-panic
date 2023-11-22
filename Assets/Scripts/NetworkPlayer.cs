@@ -11,6 +11,13 @@ public class NetworkPlayer : NetworkBehaviour
         readPerm: NetworkVariableReadPermission.Everyone,
         writePerm: NetworkVariableWritePermission.Owner
     );
+
+    public NetworkVariable<string> playerName = new NetworkVariable<string>(
+        string.Empty,
+        readPerm: NetworkVariableReadPermission.Everyone,
+        writePerm: NetworkVariableWritePermission.Owner
+    );
+
     private Vector3 prevAccelerometerInput;
 
     [Header("Low Pass filter Settings")]
@@ -83,6 +90,11 @@ public class NetworkPlayer : NetworkBehaviour
     Vector3 LowPassFilterAccelerometer(Vector3 prevValue, Vector3 newValue)
     {
         return Vector3.Lerp(prevValue, newValue, lowPassFilterFactor);
+    }
+
+    public void SetPlayerName(string name)
+    {
+        playerName.Value = name;
     }
 
 }
