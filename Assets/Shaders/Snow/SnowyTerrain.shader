@@ -330,18 +330,16 @@ Shader "Snow/SnowyTerrain"
                 }
                 #endif
 
-                // Gradually reduce vertex displacement effects as the
-                // tessellation level decreases to avoid popping artifacts
-                float tessLevel = Utils_GetDistanceBasedTessellation(positionWS);
-
                 // Sample snow deformation map
                 float2 snowUv = Snow_WorldToUv(positionWS);
                 float snowDeformation = Snow_SampleDeformation(snowUv);
-                snowDeformation *= tessLevel;
 
                 // Sample snow depth noise map
                 float snowDepthOffset = Snow_SampleDepthNoise(positionWS);
-                snowDepthOffset *= tessLevel;
+
+                // Gradually reduce vertex displacement effects as the
+                // tessellation level decreases to avoid popping artifacts
+                // snowDepthOffset *= Utils_GetDistanceBasedTessellation(positionWS);
 
                 // Deduce current depth of the snow cover
                 float snowCoverDepth = (_SnowBaseDepth + snowDepthOffset) * 1e-2f;
