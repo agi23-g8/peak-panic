@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 public class NetworkPlayer : NetworkBehaviour
 {
-    private NetworkVariable<Vector3> accelerometer = new NetworkVariable<Vector3>(
+    public NetworkVariable<Vector3> accelerometer = new NetworkVariable<Vector3>(
         Vector3.zero,
         readPerm: NetworkVariableReadPermission.Everyone,
         writePerm: NetworkVariableWritePermission.Owner

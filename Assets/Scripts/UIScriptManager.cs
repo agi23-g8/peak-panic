@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 public class UIScriptManager : MonoBehaviour
@@ -26,7 +27,7 @@ public class UIScriptManager : MonoBehaviour
 
         messagePopup = messagePopupPrefab.GetComponent<UIMessagePopup>();
     }
-    
+
     /// <summary>
     /// Go to the next UI screen in the UI Screen Elements list. 
     /// If last, it will loop back to first.
@@ -50,7 +51,7 @@ public class UIScriptManager : MonoBehaviour
     public void JoinGame()
     {
         string name = nameInputField.text;
-        string code = gameCodeInputField.text;   
+        string code = gameCodeInputField.text;
 
         if (name == "")
         {
@@ -73,10 +74,16 @@ public class UIScriptManager : MonoBehaviour
         Connect(name, code);
     }
 
-    private void Connect(string name, string code)
+    private async void Connect(string name, string code)
     {
-        bool status = false; // TODO: replace with actual connection status
-        
+
+        if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(code))
+        {
+            await RelayManager.Instance.JoinRelay(code);
+        }
+
+        bool status = NetworkManager.Singleton.StartClient();
+
         if (status)
         {
             Debug.Log("Connected to server!");
