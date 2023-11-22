@@ -2,7 +2,11 @@ using UnityEngine;
 using Unity.Collections;
 using UnityEngine.InputSystem;
 
-public class PhoneInputs : MonoBehaviour
+// References :
+//   - https://docs.unity3d.com/2022.3/Documentation/Manual/MobileInput.html
+//   - https://docs.unity3d.com/Packages/com.unity.inputsystem@1.7/api/UnityEngine.InputSystem.Accelerometer.html
+
+public class MobileAccelerometer : MonoBehaviour
 {
     [ReadOnly]
     [Tooltip("Current state of the phone's accelerometer.")]

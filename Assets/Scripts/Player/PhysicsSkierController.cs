@@ -23,8 +23,8 @@ public class PhysicsSkierController : MonoBehaviour
     private float m_sidewaysDrag = 50f;
 
     [SerializeField]
-    [Tooltip("The game object responsible for retrieving and pre-processing the inputs from the phone.")]
-    private PhoneInputs m_phoneInputs;
+    [Tooltip("The game object responsible for retrieving and pre-processing the inputs from the phone's accelerometer.")]
+    private MobileAccelerometer m_accelerometer;
 
     private Camera m_mainCamera;
     private Rigidbody m_rigidBody;
@@ -61,11 +61,11 @@ public class PhysicsSkierController : MonoBehaviour
             float verticalInput = 0f;
             float horizontalInput = 0f;
 
-            if (m_phoneInputs != null && m_phoneInputs.IsReady())
+            if (m_accelerometer != null && m_accelerometer.IsReady())
             {
-                // Get current phone inputs
-                horizontalInput = m_phoneInputs.GetX();
-                verticalInput = m_phoneInputs.GetY();
+                // Get phone's accelerometer inputs
+                horizontalInput = m_accelerometer.GetX();
+                verticalInput = m_accelerometer.GetZ();
             }
             else
             {
