@@ -22,7 +22,7 @@ Shader "Snow/SnowyTerrain"
         [Space]
         [Header(## Snow Deformation)][Space]
         _SnowTrackTint("Snow Track Tint", Color) = (1, 1, 1, 1)
-        [Toggle(RECONSTRUCT_NORMALS)] _ReconstructNormals("Reconstruct Normals", Float) = 0
+        [Toggle(RECONSTRUCT_NORMALS)] _ReconstructNormals("Reconstruct Normals", Float) = 1
 
         [Space]
         [Header(## Terrain Tessellation)][Space]
@@ -299,7 +299,7 @@ Shader "Snow/SnowyTerrain"
             };
 
             /*********************************
-            *        Vertex shaders          *
+            *         Vertex shaders         *
             *********************************/
             Varyings VertexDefault(Attributes _attributes)
             {
@@ -309,54 +309,53 @@ Shader "Snow/SnowyTerrain"
                 UNITY_TRANSFER_INSTANCE_ID(_attributes, varyings);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(varyings);
 
-                // Compute initial world space attributes
+                //____________________________________________________________________________
+                // 1 - Compute initial world space attributes
                 float3 positionWS = TransformObjectToWorld(_attributes.position.xyz);
                 float3 normalWS = TransformObjectToWorldDir(_attributes.normal.xyz);
                 float3 tangentWS = TransformObjectToWorldDir(_attributes.tangent.xyz);
                 float3 bitangentWS = normalize(cross(normalWS, tangentWS) * _attributes.tangent.w);
                 float2 worldUv = Utils_GetWorldUv(positionWS, _WorldUvScale, _WorldUvOffset);
 
-                #if defined(DEPTH_ONLY_OUT)
+                //____________________________________________________________________________
+                // 2 - Apply vertex displacement
+                float snowDeformation = 0.0f;
+
+                #if defined(GBUFFER_OUT) // || defined(SHADOW_OUT)
                 {
-                    // Just use the base depth in depth only pass
-                    float snowCoverDepth = _SnowBaseDepth * 1e-2f;
+                    // Sample snow deformation map
+                    float2 snowUv = Snow_WorldToUv(positionWS);
+                    snowDeformation = Snow_SampleDeformation(snowUv);
+
+                    // Sample snow depth noise map
+                    float snowDepthOffset = Snow_SampleDepthNoise(positionWS);
+
+                    // Deduce current depth of the snow cover
+                    float snowCoverDepth = (_SnowBaseDepth + snowDepthOffset) * 1e-2f;
+                    snowCoverDepth *= saturate(1.f - snowDeformation);
 
                     // Displace vertex up to the current snow depth
                     positionWS += normalWS * snowCoverDepth;
 
-                    // Eearly discards in depth only pass
-                    varyings.positionCS = TransformWorldToHClip(positionWS);
-                    return varyings;
+                    #if defined(RECONSTRUCT_NORMALS)
+                        // Reconstruct normal using finite difference
+                        float3 normalTS = Snow_ReconstructNormal(snowUv);
+
+                        // Convert to world space
+                        normalWS = Utils_TanToWorld(normalTS, tangentWS, bitangentWS, normalWS);
+                        normalWS = normalize(normalWS);
+                    #endif
+                }
+                #elif defined(DEPTH_ONLY_OUT)
+                {
+                    // Just apply the base snow depth
+                    float snowCoverDepth = _SnowBaseDepth * 1e-2f;
+                    positionWS += normalWS * snowCoverDepth;
                 }
                 #endif
 
-                // Sample snow deformation map
-                float2 snowUv = Snow_WorldToUv(positionWS);
-                float snowDeformation = Snow_SampleDeformation(snowUv);
-
-                // Sample snow depth noise map
-                float snowDepthOffset = Snow_SampleDepthNoise(positionWS);
-
-                // Gradually reduce vertex displacement effects as the
-                // tessellation level decreases to avoid popping artifacts
-                // snowDepthOffset *= Utils_GetDistanceBasedTessellation(positionWS);
-
-                // Deduce current depth of the snow cover
-                float snowCoverDepth = (_SnowBaseDepth + snowDepthOffset) * 1e-2f;
-                snowCoverDepth *= saturate(1.f - snowDeformation);
-
-                // Displace vertex up to the current snow depth
-                positionWS += normalWS * snowCoverDepth;
-
-                #if defined(RECONSTRUCT_NORMALS)
-                    // Reconstruct normal using finite difference
-                    float3 normalTS = Snow_ReconstructNormal(snowUv);
-
-                    // Convert to world space
-                    normalWS = Utils_TanToWorld(normalTS, tangentWS, bitangentWS, normalWS);
-                    normalWS = normalize(normalWS);
-                #endif
-
+                //____________________________________________________________________________
+                // 3 - Export varyings
                 #if defined(GBUFFER_OUT)
                 {
                     varyings.positionWS = positionWS;
@@ -407,6 +406,11 @@ Shader "Snow/SnowyTerrain"
                     #else
                         varyings.positionCS.z = max(varyings.positionCS.z, UNITY_NEAR_CLIP_VALUE);
                     #endif
+                }
+                #elif defined(DEPTH_ONLY_OUT)
+                {
+                    // Compute clip position
+                    varyings.positionCS = TransformWorldToHClip(positionWS);
                 }
                 #endif
 
@@ -506,7 +510,6 @@ Shader "Snow/SnowyTerrain"
             /*********************************
             *        Fragment shaders        *
             *********************************/
-
             half4 FragmentDefault(Varyings _varyings) : SV_TARGET
             {
                 return 0;
@@ -518,12 +521,14 @@ Shader "Snow/SnowyTerrain"
                     UNITY_SETUP_INSTANCE_ID(_varyings);
                     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(_varyings);
 
-                    // re-normalize word space directions
+                    //____________________________________________________________________________
+                    // Re-normalize interpolated word directions
                     float3 tangentWS = SafeNormalize(_varyings.tangentWS);
                     float3 bitangentWS = SafeNormalize(_varyings.bitangentWS);
                     float3 normalWS = SafeNormalize(_varyings.normalWS);
 
-                    // SURFACE DATA
+                    //____________________________________________________________________________
+                    // Compute surface data
                     SurfaceData surfaceData = (SurfaceData)0;
                     {
                         // tint the snow tracks using multiply blending
@@ -551,7 +556,8 @@ Shader "Snow/SnowyTerrain"
                         surfaceData.alpha = 1.0;
                     }
 
-                    // INPUT DATA
+                    //____________________________________________________________________________
+                    // Compute input data
                     InputData inputData = (InputData)0;
                     {
                         inputData.positionCS = _varyings.positionCS;
@@ -590,11 +596,13 @@ Shader "Snow/SnowyTerrain"
                         inputData.fogCoord = 0;
                     }
 
-                    // BRDF DATA
+                    //____________________________________________________________________________
+                    // Compute BRDF data
                     BRDFData brdfData;
                     InitializeBRDFData(surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.alpha, brdfData);
 
-                    // GI COLOR
+                    //____________________________________________________________________________
+                    // Compute Global Illumination
                     half3 GIColor = half3(0, 0, 0);
                     {
                         Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, inputData.shadowMask);
@@ -602,46 +610,13 @@ Shader "Snow/SnowyTerrain"
                         GIColor = GlobalIllumination(brdfData, inputData.bakedGI, surfaceData.occlusion, inputData.positionWS, inputData.normalWS, inputData.viewDirectionWS);
                     }
 
+                    //____________________________________________________________________________
+                    // Write to G-Buffer
                     return BRDFDataToGbuffer(brdfData, inputData, surfaceData.smoothness, surfaceData.emission + GIColor, surfaceData.occlusion);
                 }
             #endif
 
         ENDHLSL
-
-        // SHADOW PASS
-        Pass
-        {
-            Name "ShadowCaster"
-            Tags { "LightMode" = "ShadowCaster" }
-
-            // -------------------------------------
-            // Fixed states
-            ZWrite On
-            ZTest LEqual
-            Cull Back
-            ColorMask 0
-
-            HLSLPROGRAM
-                #pragma target 2.0
-                #pragma require tessellation tessHW
-
-                // -------------------------------------
-                // Shader Stages
-                // #pragma vertex VertexDefault
-                #pragma vertex VertexTessellation
-                #pragma hull HullTessellation
-                #pragma domain DomainTessellation
-                #pragma fragment FragmentDefault
-
-                // -------------------------------------
-                // Unity keywords
-                #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
-
-                // -------------------------------------
-                // Custom keywords
-                #pragma multi_compile SHADOW_OUT
-            ENDHLSL
-        }
 
         // GBUFFER PASS
         Pass
@@ -657,10 +632,12 @@ Shader "Snow/SnowyTerrain"
 
             HLSLPROGRAM
                 #pragma target 4.5
-                #pragma require tessellation tessHW
 
                 // Deferred Rendering Path does not support the OpenGL-based graphics API
                 #pragma exclude_renderers gles3 glcore
+
+                // Tessellation control and evaluation stages are used in the G-Buffer pass
+                #pragma require tessellation tessHW
 
                 // -------------------------------------
                 // Shader Stages
@@ -690,6 +667,37 @@ Shader "Snow/SnowyTerrain"
                 #pragma multi_compile GBUFFER_OUT
                 #pragma multi_compile_vertex _ RECONSTRUCT_NORMALS
                 #pragma multi_compile_domain _ RECONSTRUCT_NORMALS
+            ENDHLSL
+        }
+
+        // SHADOW PASS
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags { "LightMode" = "ShadowCaster" }
+
+            // -------------------------------------
+            // Fixed states
+            ZWrite On
+            ZTest LEqual
+            Cull Back
+            ColorMask 0
+
+            HLSLPROGRAM
+                #pragma target 2.0
+
+                // -------------------------------------
+                // Shader Stages
+                #pragma vertex VertexDefault
+                #pragma fragment FragmentDefault
+
+                // -------------------------------------
+                // Unity keywords
+                #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+
+                // -------------------------------------
+                // Custom keywords
+                #pragma multi_compile SHADOW_OUT
             ENDHLSL
         }
 

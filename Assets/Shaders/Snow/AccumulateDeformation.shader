@@ -47,7 +47,9 @@ Shader "Snow/AccumulateDeformation"
             /*********************************
             *       Material resources       *
             *********************************/
-            uniform float _FilterRadius;
+            CBUFFER_START(UnityPerMaterial)
+                float _FilterRadius;
+            CBUFFER_END
 
             /*********************************
             *        Vertex attributes       *
