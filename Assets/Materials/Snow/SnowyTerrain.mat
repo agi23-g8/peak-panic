@@ -151,7 +151,7 @@ Material:
     - _Surface: 0
     - _TessellationAreaRadius: 16
     - _TessellationDistance: 35
-    - _TessellationFactor: 40
+    - _TessellationFactor: 35
     - _WorkflowMode: 1
     - _WorldUvOffset: 0
     - _WorldUvScale: 0.1

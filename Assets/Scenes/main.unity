@@ -412,7 +412,7 @@ MonoBehaviour:
   m_jumpIntensity: 30
   m_jumpLandingBoost: 100
   m_backflipSpeedThreshold: 16
-  m_backflipIntensity: 20
+  m_backflipIntensity: 25
 --- !u!65 &21793048
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1084,7 +1084,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &347071411
 MonoBehaviour:
   m_ObjectHideFlags: 0
