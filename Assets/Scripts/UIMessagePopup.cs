@@ -6,11 +6,6 @@ public class UIMessagePopup : MonoBehaviour
 {
     public TextMeshProUGUI messageText;
 
-    private void Start()
-    {
-        gameObject.SetActive(false);
-    }
-
     public void Show(string text, float duration)
     {
         gameObject.SetActive(true);
