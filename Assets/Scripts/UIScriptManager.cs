@@ -87,6 +87,7 @@ public class UIScriptManager : MonoBehaviour
 
         Connect(code);
 
+        playmodeName.text = name;
         StartCoroutine(SetNetworkPlayerName(name));
     }
 
@@ -129,7 +130,7 @@ public class UIScriptManager : MonoBehaviour
         // set the name
         networkPlayer.GetComponent<NetworkPlayer>().SetPlayerName(name);
 
-        playmodeName.text = name;
+        
     }
 
 
