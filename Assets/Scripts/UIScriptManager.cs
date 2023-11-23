@@ -14,6 +14,7 @@ public class UIScriptManager : MonoBehaviour
     public TMP_InputField gameCodeInputField;
     public TMP_Text joinButtonText;
     public TMP_Text playmodeInfoText;
+    public TMP_Text playmodeName;
 
     public GameObject messagePopupPrefab;
     public float messagePopupDuration = 2.5f;
@@ -127,6 +128,8 @@ public class UIScriptManager : MonoBehaviour
 
         // set the name
         networkPlayer.GetComponent<NetworkPlayer>().SetPlayerName(name);
+
+        playmodeName.text = name;
     }
 
 
