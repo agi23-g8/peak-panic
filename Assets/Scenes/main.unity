@@ -397,22 +397,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32dd580e03240b040b55783fb91204e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_respawn: 0
-  m_globalMoveSpeed: 50
-  m_globalRotateSpeed: 5
+  m_moveSpeed: 35
+  m_turnSpeed: 4
   m_inertiaFactor: 30
+  m_additionalGravity: 100
   m_sidewaysDrag: 50
   m_accelerometer: {fileID: 347071411}
-  m_state: 0
-  m_baseForwardSpeed: 1
   m_carvingDetectionThreshold: 0.05
-  m_carvingIntensity: 4
-  m_carvingBoost: 40
-  m_jumpDetectionThreshold: 0.8
-  m_jumpIntensity: 30
-  m_jumpLandingBoost: 100
-  m_backflipSpeedThreshold: 16
-  m_backflipIntensity: 25
+  m_carvingDirectionInfluence: 6
+  m_carvingSpeedInfluence: 10
+  m_carvingStartBoost: 40
+  m_jumpDetectionThreshold: 0.7
+  m_jumpPower: 35
+  m_jumpLandingBoost: 185
+  m_jumpFlipSpeed: 750
 --- !u!65 &21793048
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1298,9 +1296,10 @@ GameObject:
   - component: {fileID: 371779133}
   - component: {fileID: 371779132}
   - component: {fileID: 371779131}
+  - component: {fileID: 371779134}
   m_Layer: 3
   m_Name: Ramp
-  m_TagString: Untagged
+  m_TagString: Jump
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -1392,6 +1391,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 371779129}
   m_Mesh: {fileID: -478882678752539408, guid: d2277db973a8f7542a77cc5b5911b3ae, type: 3}
+--- !u!65 &371779134
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 371779129}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 10.3077135, y: 3.6794908, z: 10.000002}
+  m_Center: {x: -0.15385866, y: 1.8397452, z: 0.0000019073486}
 --- !u!1 &381362066
 GameObject:
   m_ObjectHideFlags: 0
@@ -6788,6 +6808,73 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1311294864
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1311294867}
+  - component: {fileID: 1311294865}
+  - component: {fileID: 1311294868}
+  m_Layer: 0
+  m_Name: Respawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1311294865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311294864}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d535aea7ca75e614788d74f0f5052f90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_objectToRespawn: {fileID: 21793040}
+--- !u!4 &1311294867
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311294864}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -175, z: 546.3}
+  m_LocalScale: {x: 80, y: 10, z: 40}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &1311294868
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311294864}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1353998951
 GameObject:
   m_ObjectHideFlags: 0
@@ -7424,6 +7511,7 @@ SceneRoots:
   - {fileID: 347071412}
   - {fileID: 832575519}
   - {fileID: 2125471856}
+  - {fileID: 1311294867}
   - {fileID: 157351353}
   - {fileID: 456514153}
   - {fileID: 185320782}
