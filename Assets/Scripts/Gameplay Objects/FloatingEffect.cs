@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class FloatingEffect : MonoBehaviour
 {
-    public float bounceHeight = 0.5f; // Hauteur du rebond
-    public float bounceSpeed = 4.0f; // Vitesse du rebond
+    public float bounceHeight = 0.5f;
+    public float bounceSpeed = 4.0f;
 
     private Vector3 originalPosition;
 
@@ -16,7 +16,6 @@ public class FloatingEffect : MonoBehaviour
 
     private void Update()
     {
-        // Calcul du mouvement vertical utilisant une fonction sinusoidale pour créer un effet de rebond
         float yOffset = Mathf.Sin(Time.time * bounceSpeed) * bounceHeight;
         transform.position = originalPosition + new Vector3(0f, yOffset, 0f);
     }
