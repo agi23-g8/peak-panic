@@ -740,8 +740,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e443d8069252b8a429a775358c88fa7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_objectToFollow: {fileID: 21793041}
-  m_camOffset: {x: 0, y: 3, z: -17.2}
+  m_objectToFollow: {fileID: 0}
+  m_camOffset: {x: 0, y: 3, z: -7}
   m_blendFactor: 3
   m_minHeightFromTerrain: 5
 --- !u!1 &347071410
