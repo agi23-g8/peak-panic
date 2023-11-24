@@ -33,8 +33,15 @@ public class GameCameraController : MonoBehaviour
         if (m_objectToFollow == null)
         {
             // Find object with component "PhysicsSkierController"
-            m_objectToFollow = FindObjectOfType<PhysicsSkierController>().transform;
-            return;
+            var target = FindObjectOfType<PhysicsSkierController>();
+            if (target != null)
+            {
+                m_objectToFollow = target.transform;
+            }
+            else
+            {
+                return;
+            }
         }
 
         // Compute target transform to follow the object
