@@ -14,6 +14,9 @@ public class ServerManager : MonoBehaviour
     private GameObject playerPrefab;
 
     [SerializeField]
+    private Transform spawnPoint;
+
+    [SerializeField]
     private Button startGameButton;
 
     // A map from NetworkPlayer to Player 
@@ -37,9 +40,16 @@ public class ServerManager : MonoBehaviour
             Debug.Log("Server failed to start!");
 
 
-        // Handle client connection
-        NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        // Handle client connection and disconnection
+        if (NetworkManager.Singleton.IsServer)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        }
+        else
+        {
+            Debug.Log("Something went wrong! This is not a server!");
+        }
     }
 
     // private void OnClientConnected(ulong clientId) => Debug.Log($"=> OnClientConnected({clientId})");
@@ -53,7 +63,7 @@ public class ServerManager : MonoBehaviour
         // find the NetworkPlayer object
         GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
         // Instantiate the Player object
-        GameObject player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+        GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
         // Keep track of the player
         playerMap.Add(networkPlayer, player);
 

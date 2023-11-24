@@ -56,6 +56,8 @@ public class UIScriptManager : MonoBehaviour
     /// </summary>
     public void JoinGame()
     {
+        Logger.Instance.LogInfo("Joining game...");
+
         string name = nameInputField.text;
         string code = gameCodeInputField.text;
 
@@ -104,6 +106,7 @@ public class UIScriptManager : MonoBehaviour
         if (status)
         {
             Debug.Log("Connected to server!");
+            Logger.Instance.LogInfo("Connected to server!");
             Next();
         }
         else

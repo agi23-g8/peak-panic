@@ -30,6 +30,13 @@ public class GameCameraController : MonoBehaviour
 
     private void Update()
     {
+        if (m_objectToFollow == null)
+        {
+            // Find object with component "PhysicsSkierController"
+            m_objectToFollow = FindObjectOfType<PhysicsSkierController>().transform;
+            return;
+        }
+
         // Compute target transform to follow the object
         Vector3 targetPosition = m_objectToFollow.position + m_camOffset;
         Quaternion targetRotation = Quaternion.LookRotation(m_objectToFollow.position - transform.position);

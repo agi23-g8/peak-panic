@@ -32,6 +32,12 @@ public class NetworkPlayer : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if (IsClient)
+        {
+            Logger.Instance.LogInfo("NetworkPlayer spawned on client");
+        }
+
+
         if (IsOwner)
         {
             Logger.Instance.LogInfo("I am the owner");
@@ -83,6 +89,11 @@ public class NetworkPlayer : NetworkBehaviour
             accelerometerInput = LowPassFilterAccelerometer(prevAccelerometerInput, accelerometerInput);
             accelerometer.Value = accelerometerInput;
             prevAccelerometerInput = accelerometerInput;
+            Logger.Instance.LogInfo("Accelerometer: " + accelerometer.Value);
+        }
+        if (IsServer)
+        {
+            Debug.Log("Accelerometer: " + accelerometer.Value);
         }
     }
 
