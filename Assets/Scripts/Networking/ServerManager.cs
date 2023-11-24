@@ -5,8 +5,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System;
 
-public class ServerManager : Singleton<ServerManager>
+public class ServerManager : MonoBehaviour
 {
 
     [SerializeField]
@@ -31,9 +32,9 @@ public class ServerManager : Singleton<ServerManager>
             await RelayManager.Instance.SetupRelay();
 
         if (NetworkManager.Singleton.StartServer())
-            Logger.Instance.LogInfo("Server started...");
+            Debug.Log("Server started successfully!");
         else
-            Logger.Instance.LogInfo("Unable to start server...");
+            Debug.Log("Server failed to start!");
 
 
         // Handle client connection
@@ -41,20 +42,23 @@ public class ServerManager : Singleton<ServerManager>
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
     }
 
-    private void OnDestroy()
-    {
-        NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
-        NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
-    }
+    // private void OnClientConnected(ulong clientId) => Debug.Log($"=> OnClientConnected({clientId})");
 
-    void OnClientConnected(ulong clientID)
+
+    private void OnClientConnected(ulong clientID)
     {
+        Debug.Log("Client connected: " + clientID);
+        Debug.Log("Number of clients connected: " + NetworkManager.Singleton.ConnectedClientsList.Count);
+
         // find the NetworkPlayer object
         GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
         // Instantiate the Player object
         GameObject player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
         // Keep track of the player
         playerMap.Add(networkPlayer, player);
+
+        PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
+        skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
     }
 
     void OnClientDisconnected(ulong clientID)
@@ -74,8 +78,8 @@ public class ServerManager : Singleton<ServerManager>
 
         // TODO: Update the actual player object with the network player
         // Something like:
-        // foreach (GameObject player in playerMap.Values)
-        //      player.GetComponent<Player>().SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
+
+
         // Then, in Player.cs, you can do:
         // void SetNetworkPlayer(NetworkPlayer networkPlayer)
         // {
@@ -87,6 +91,7 @@ public class ServerManager : Singleton<ServerManager>
     // Update is called once per frame
     void Update()
     {
-
+        if (NetworkManager.Singleton.IsServer)
+            Debug.Log("Number of clients connected: " + NetworkManager.Singleton.ConnectedClientsList.Count);
     }
 }

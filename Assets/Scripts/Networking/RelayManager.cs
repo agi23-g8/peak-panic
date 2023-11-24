@@ -24,7 +24,7 @@ public class RelayManager : Singleton<RelayManager>
 
     public async Task<RelayHostData> SetupRelay()
     {
-        Logger.Instance.LogInfo($"Relay Server Starting With Max Connections: {maxNumberOfConnections}");
+        Debug.Log($"Relay Server Starting With Max Connections: {maxNumberOfConnections}");
 
         InitializationOptions options = new InitializationOptions()
             .SetEnvironmentName(environment);
@@ -51,7 +51,7 @@ public class RelayManager : Singleton<RelayManager>
 
         Transport.SetRelayServerData(new RelayServerData(allocation, "wss"));
 
-        Logger.Instance.LogInfo($"Relay Server Generated Join Code: {relayHostData.JoinCode}");
+        Debug.Log($"Relay Server Generated Join Code: {relayHostData.JoinCode}");
 
         return relayHostData;
     }

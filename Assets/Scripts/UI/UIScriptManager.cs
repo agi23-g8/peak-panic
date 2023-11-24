@@ -88,7 +88,7 @@ public class UIScriptManager : MonoBehaviour
         Connect(code);
 
         playmodeName.text = name;
-        StartCoroutine(SetNetworkPlayerName(name));
+        // StartCoroutine(SetNetworkPlayerName(name));
     }
 
     private async void Connect(string code)
@@ -115,23 +115,23 @@ public class UIScriptManager : MonoBehaviour
         }
     }
 
-    IEnumerator SetNetworkPlayerName(string name)
-    {
-        // when the network player prefab is spawned, set the name
+    // IEnumerator SetNetworkPlayerName(string name)
+    // {
+    //     // when the network player prefab is spawned, set the name
 
-        // search for a game object with the NetworkPlayer component
-        GameObject networkPlayer = null;
-        while (networkPlayer == null)
-        {
-            networkPlayer = GameObject.FindObjectOfType<NetworkPlayer>()?.gameObject;
-            yield return new WaitForSeconds(0.5f);
-        }
+    //     // search for a game object with the NetworkPlayer component
+    //     GameObject networkPlayer = null;
+    //     while (networkPlayer == null)
+    //     {
+    //         networkPlayer = GameObject.FindObjectOfType<NetworkPlayer>()?.gameObject;
+    //         yield return new WaitForSeconds(0.5f);
+    //     }
 
-        // set the name
-        networkPlayer.GetComponent<NetworkPlayer>().SetPlayerName(name);
+    //     // set the name
+    //     networkPlayer.GetComponent<NetworkPlayer>().SetPlayerName(name);
 
-        
-    }
+
+    // }
 
 
 }

@@ -12,11 +12,11 @@ public class NetworkPlayer : NetworkBehaviour
         writePerm: NetworkVariableWritePermission.Owner
     );
 
-    public NetworkVariable<string> playerName = new NetworkVariable<string>(
-        string.Empty,
-        readPerm: NetworkVariableReadPermission.Everyone,
-        writePerm: NetworkVariableWritePermission.Owner
-    );
+    // public NetworkVariable<string> playerName = new NetworkVariable<string>(
+    //     string.Empty,
+    //     readPerm: NetworkVariableReadPermission.Everyone,
+    //     writePerm: NetworkVariableWritePermission.Owner
+    // );
 
     private Vector3 prevAccelerometerInput;
 
@@ -51,7 +51,6 @@ public class NetworkPlayer : NetworkBehaviour
 
         if (IsServer)
         {
-            Logger.Instance.LogInfo("I am the server");
             accelerometer.OnValueChanged += OnAccelerometerChanged;
         }
     }
@@ -66,7 +65,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     public void OnAccelerometerChanged(Vector3 prevValue, Vector3 newValue)
     {
-        Logger.Instance.LogInfo("Accelerometer changed from " + prevValue + " to " + newValue);
+        Debug.Log("Accelerometer changed from " + prevValue + " to " + newValue);
     }
 
     void SetupAccelerometer()
@@ -92,9 +91,25 @@ public class NetworkPlayer : NetworkBehaviour
         return Vector3.Lerp(prevValue, newValue, lowPassFilterFactor);
     }
 
-    public void SetPlayerName(string name)
+    // public void SetPlayerName(string name)
+    // {
+    //     playerName.Value = name;
+    // }
+
+    public float GetX()
     {
-        playerName.Value = name;
+        return accelerometer.Value.x;
     }
+
+    public float GetY()
+    {
+        return accelerometer.Value.y;
+    }
+
+    public float GetZ()
+    {
+        return accelerometer.Value.z;
+    }
+
 
 }
