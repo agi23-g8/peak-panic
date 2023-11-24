@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RainbowSphere : MonoBehaviour
+public class RaimbowEffect : MonoBehaviour
 {
-    public float colorChangeSpeed = 1.0f; // Vitesse de changement de couleur
+    public float colorChangeSpeed = 1.0f;
 
     private Material material;
     private float hueValue = 0f;
@@ -20,13 +20,9 @@ public class RainbowSphere : MonoBehaviour
 
     private void Update()
     {
-        // Vérifie si le matériau de la sphère est bien configuré
         if (material != null)
         {
-            // Incrémente la valeur de teinte (Hue) pour changer la couleur
             hueValue = (hueValue + colorChangeSpeed * Time.deltaTime) % 1.0f;
-
-            // Applique la nouvelle couleur avec une valeur de teinte différente
             material.color = Color.HSVToRGB(hueValue, 1f, 1f);
         }
     }
