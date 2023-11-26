@@ -30,8 +30,9 @@ public class GameCameraController : MonoBehaviour
 
     private void Update()
     {
+        Vector3 offset = m_objectToFollow.right * m_camOffset.x + m_objectToFollow.up * m_camOffset.y + m_objectToFollow.forward * m_camOffset.z;
         // Compute target transform to follow the object
-        Vector3 targetPosition = m_objectToFollow.position + m_camOffset;
+        Vector3 targetPosition = m_objectToFollow.position + offset;//m_camOffset;
         Quaternion targetRotation = Quaternion.LookRotation(m_objectToFollow.position - transform.position);
 
         // Raycast down to find the terrain height at the target position
