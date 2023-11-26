@@ -14,13 +14,12 @@ public class ServerManager : MonoBehaviour
     private GameObject playerPrefab;
 
     [SerializeField]
-    private Transform spawnPoint;
-
-    [SerializeField]
     private Button startGameButton;
 
     // A map from NetworkPlayer to Player 
     private Dictionary<GameObject, GameObject> playerMap = new Dictionary<GameObject, GameObject>();
+
+    private List<GameObject> players = new List<GameObject>();
 
     // Start is called before the first frame update
     async void Start()
@@ -63,12 +62,19 @@ public class ServerManager : MonoBehaviour
         // find the NetworkPlayer object
         GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
         // Instantiate the Player object
-        GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-        // Keep track of the player
-        playerMap.Add(networkPlayer, player);
 
-        PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
-        skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
+        //10 players for debugging
+        for (int i = 0; i < 10; i++)
+        {
+            Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
+            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+            // Keep track of the player
+            // playerMap.Add(networkPlayer, player);
+            players.Add(player);
+
+            PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
+            skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
+        }
     }
 
     void OnClientDisconnected(ulong clientID)
@@ -85,17 +91,12 @@ public class ServerManager : MonoBehaviour
     public void StartGame()
     {
         // START GAME when all players have joined
-
-        // TODO: Update the actual player object with the network player
-        // Something like:
-
-
-        // Then, in Player.cs, you can do:
-        // void SetNetworkPlayer(NetworkPlayer networkPlayer)
-        // {
-        //     networkPlayer.accelerometer.OnValueChanged += OnAccelerometerChanged;
-        //     networkPlayer.playerName.OnValueChanged += OnPlayerNameChanged;
-        // }
+        foreach (GameObject player in players)
+        {
+            PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
+            skierController.Unfreeze();
+        }
+        GameCameraController.Instance.UpdatePlayerList();
     }
 
     // Update is called once per frame

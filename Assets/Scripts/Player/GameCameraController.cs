@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GameCameraController : MonoBehaviour
+public class GameCameraController : Singleton<GameCameraController>
 {
     [SerializeField]
     [Tooltip("The transform that the camera will follow.")]
@@ -23,6 +23,8 @@ public class GameCameraController : MonoBehaviour
 
     private int m_terrainLayer;
 
+    private GameObject[] players;
+
     private void Start()
     {
         m_terrainLayer = 1 << LayerMask.NameToLayer("Terrain");
@@ -30,22 +32,14 @@ public class GameCameraController : MonoBehaviour
 
     private void Update()
     {
-        if (m_objectToFollow == null)
+        if (players != null && players.Length > 0)
         {
-            // Find object with component "PhysicsSkierController"
-            var target = FindObjectOfType<PhysicsSkierController>();
-            if (target != null)
-            {
-                m_objectToFollow = target.transform;
-            }
-            else
-            {
-                return;
-            }
+            m_objectToFollow = FindCurrentLeader();
         }
 
         // Compute target transform to follow the object
         Vector3 targetPosition = m_objectToFollow.position + m_camOffset;
+        targetPosition.x = GetAveragePosition().x;
         Quaternion targetRotation = Quaternion.LookRotation(m_objectToFollow.position - transform.position);
 
         // Raycast down to find the terrain height at the target position
@@ -60,5 +54,47 @@ public class GameCameraController : MonoBehaviour
         float blendWeight = Mathf.Clamp(m_blendFactor * Time.deltaTime, 0f, 1f);
         transform.position = Vector3.Lerp(transform.position, targetPosition, blendWeight);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, blendWeight);
+
+        // Prevent camera from yaw and roll
+        transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 0f, 0f);
     }
+
+    private Transform FindCurrentLeader()
+    {
+        // which player is in the lead?
+        // which player has the largest z value?
+        // return that player's transform
+
+        float maxZ = -Mathf.Infinity;
+        Transform leader = players[0].transform;
+        foreach (GameObject player in players)
+        {
+            if (player.transform.position.z > maxZ)
+            {
+                maxZ = player.transform.position.z;
+                leader = player.transform;
+            }
+        }
+        return leader;
+    }
+
+    private Vector3 GetAveragePosition()
+    {
+        Vector3 averagePosition = Vector3.zero;
+        foreach (GameObject player in players)
+        {
+            averagePosition += player.transform.position;
+
+        }
+        averagePosition /= players.Length;
+
+        return averagePosition;
+    }
+
+    public void UpdatePlayerList()
+    {
+        players = GameObject.FindGameObjectsWithTag("Player");
+        Debug.Log("Number of players: " + players.Length);
+    }
+
 }

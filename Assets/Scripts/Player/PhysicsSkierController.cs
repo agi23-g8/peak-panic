@@ -120,7 +120,8 @@ public class PhysicsSkierController : MonoBehaviour
         m_startCarvingLastTime = Time.time;
 
         m_rigidBody = GetComponent<Rigidbody>();
-        m_rigidBody.freezeRotation = true;
+        // m_rigidBody.freezeRotation = true;
+        Freeze();
 
         Collider collider = GetComponent<Collider>();
         m_skierHeight = collider.bounds.size.y;
@@ -355,4 +356,16 @@ public class PhysicsSkierController : MonoBehaviour
     {
         m_networkPlayer = networkPlayer;
     }
+
+    public void Freeze()
+    {
+        m_rigidBody.constraints = RigidbodyConstraints.FreezeAll;
+    }
+
+    public void Unfreeze()
+    {
+        m_rigidBody.constraints = RigidbodyConstraints.FreezeRotation;
+    }
+
+
 }

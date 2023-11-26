@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 6752559110846383488}
   m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -240,6 +240,7 @@ MonoBehaviour:
   m_additionalGravity: 100
   m_sidewaysDrag: 50
   m_accelerometer: {fileID: 0}
+  m_networkPlayer: {fileID: 0}
   m_carvingDetectionThreshold: 0.05
   m_carvingDirectionInfluence: 6
   m_carvingSpeedInfluence: 10

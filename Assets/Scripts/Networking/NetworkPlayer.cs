@@ -55,10 +55,10 @@ public class NetworkPlayer : NetworkBehaviour
 
         }
 
-        if (IsServer)
-        {
-            accelerometer.OnValueChanged += OnAccelerometerChanged;
-        }
+        // if (IsServer)
+        // {
+        //     accelerometer.OnValueChanged += OnAccelerometerChanged;
+        // }
     }
 
     public override void OnDestroy()
@@ -93,7 +93,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
         if (IsServer)
         {
-            Debug.Log("Accelerometer: " + accelerometer.Value);
+            // Debug.Log("Accelerometer: " + accelerometer.Value);
         }
     }
 
