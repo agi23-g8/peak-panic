@@ -63,18 +63,16 @@ public class ServerManager : MonoBehaviour
         GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
         // Instantiate the Player object
 
-        //10 players for debugging
-        for (int i = 0; i < 10; i++)
-        {
-            Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
-            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-            // Keep track of the player
-            // playerMap.Add(networkPlayer, player);
-            players.Add(player);
 
-            PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
-            skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
-        }
+        Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
+        GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+        // Keep track of the player
+        playerMap.Add(networkPlayer, player);
+        players.Add(player);
+
+        PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
+        skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
+
     }
 
     void OnClientDisconnected(ulong clientID)
@@ -85,6 +83,7 @@ public class ServerManager : MonoBehaviour
         Destroy(playerMap[networkPlayer]);
         // Remove the player from the map
         playerMap.Remove(networkPlayer);
+        players.Remove(networkPlayer);
     }
 
 
