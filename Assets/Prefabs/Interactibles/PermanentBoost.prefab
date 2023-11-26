@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 343814524139854983}
   - component: {fileID: 616733382775952250}
   - component: {fileID: 1954496450123768752}
-  - component: {fileID: 1923357897907563605}
+  - component: {fileID: 6739205665577370757}
   m_Layer: 0
   m_Name: PermanentBoost
   m_TagString: Untagged
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boostForce: 20
   boostDuration: 3
---- !u!65 &1923357897907563605
+--- !u!65 &6739205665577370757
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -115,9 +115,9 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10.901051, y: 1.2959218, z: 12.72295}
-  m_Center: {x: -0.011814596, y: 0.6479624, z: 0.44337654}
+  m_Size: {x: 5.4505253, y: 0.5409779, z: 6.3614616}
+  m_Center: {x: -0.0059072976, y: 0.27048936, z: 0.22168829}
