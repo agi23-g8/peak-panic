@@ -18,6 +18,12 @@ public class ServerManager : Singleton<ServerManager>
     [SerializeField]
     private Button startGameButton;
 
+    [SerializeField]
+    private GameObject joinCode;
+
+    [SerializeField]
+    private GameObject qrCodeImage;
+
     // A map from NetworkPlayer to Player 
     private Dictionary<GameObject, GameObject> playerMap = new Dictionary<GameObject, GameObject>();
 
@@ -33,16 +39,26 @@ public class ServerManager : Singleton<ServerManager>
         {
             StartGame();
             startGameButton.gameObject.SetActive(false);
+            joinCode.SetActive(false);
+            qrCodeImage.SetActive(false);
         });
 
+        RelayHostData hostData;
         if (RelayManager.Instance.IsRelayEnabled)
-            await RelayManager.Instance.SetupRelay();
+        {
+            hostData = await RelayManager.Instance.SetupRelay();
+        }
+        else
+        {
+            throw new Exception("Relay could not be enabled!");
+        }
 
         if (NetworkManager.Singleton.StartServer())
             Debug.Log("Server started successfully!");
         else
             Debug.Log("Server failed to start!");
 
+        joinCode.GetComponentInChildren<TMP_Text>().text = hostData.JoinCode;
 
         // Handle client connection and disconnection
         if (NetworkManager.Singleton.IsServer)
