@@ -113,8 +113,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2976079643486125407}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.041018832, y: -0, z: -0, w: 0.99915844}
-  m_LocalPosition: {x: 0, y: 2.564, z: 0.01}
+  m_LocalRotation: {x: 0.06973612, y: 0, z: 0, w: 0.99756557}
+  m_LocalPosition: {x: 0, y: 1.49, z: -30.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -235,16 +235,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_moveSpeed: 35
-  m_turnSpeed: 4
+  m_turnSpeed: 3
   m_inertiaFactor: 30
   m_additionalGravity: 100
   m_sidewaysDrag: 50
   m_accelerometer: {fileID: 0}
   m_networkPlayer: {fileID: 0}
-  m_carvingDetectionThreshold: 0.05
-  m_carvingDirectionInfluence: 6
-  m_carvingSpeedInfluence: 10
-  m_carvingStartBoost: 40
+  m_carvingDetectionThreshold: 0.06
+  m_carvingDirectionInfluence: 2
+  m_carvingSpeedInfluence: 3
+  m_carvingStartBoost: 15
   m_jumpDetectionThreshold: 0.7
   m_jumpPower: 35
   m_jumpLandingBoost: 185

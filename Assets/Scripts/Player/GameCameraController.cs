@@ -12,9 +12,13 @@ public class GameCameraController : Singleton<GameCameraController>
 
     [SerializeField]
     [Range(0f, 20f)]
-    [Tooltip("Factor controlling the blending of camera movement.")]
-    private float m_blendFactor = 5f;
+    [Tooltip("Factor controlling the blending of camera translation.")]
+    private float m_translationBlend = 3f;
 
+    [SerializeField]
+    [Range(0f, 20f)]
+    [Tooltip("Factor controlling the blending of camera rotation.")]
+    private float m_rotationBlend = 1f;
 
     [SerializeField]
     [Range(0f, 20f)]
@@ -32,14 +36,21 @@ public class GameCameraController : Singleton<GameCameraController>
 
     private void Update()
     {
-        if (players != null && players.Length > 0)
+        if (players == null || players.Length == 0)
         {
-            m_objectToFollow = FindCurrentLeader();
+            return;
         }
 
         // Compute target transform to follow the object
-        Vector3 targetPosition = m_objectToFollow.position + m_camOffset;
+        m_objectToFollow = FindCurrentLeader();
+        Vector3 targetPosition = m_objectToFollow.position;
         targetPosition.x = GetAveragePosition().x;
+
+        // Offset the camera to see the player from behind
+        Vector3 offset = m_camOffset;
+        offset = m_objectToFollow.right * offset.x + m_objectToFollow.up * offset.y + m_objectToFollow.forward * offset.z;
+        targetPosition += offset;
+
         Quaternion targetRotation = Quaternion.LookRotation(m_objectToFollow.position - transform.position);
 
         // Raycast down to find the terrain height at the target position
@@ -51,12 +62,14 @@ public class GameCameraController : Singleton<GameCameraController>
         }
 
         // Smoothly move the camera towards the target transform
-        float blendWeight = Mathf.Clamp(m_blendFactor * Time.deltaTime, 0f, 1f);
-        transform.position = Vector3.Lerp(transform.position, targetPosition, blendWeight);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, blendWeight);
+        float translationBlendWeight = Mathf.Clamp(m_translationBlend * Time.deltaTime, 0f, 1f);
+        transform.position = Vector3.Lerp(transform.position, targetPosition, translationBlendWeight);
+
+        float rotationBlendWeight = Mathf.Clamp(m_rotationBlend * Time.deltaTime, 0f, 1f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationBlendWeight);
 
         // Prevent camera from yaw and roll
-        transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 0f, 0f);
+        //transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 0f, 0f);
     }
 
     private Transform FindCurrentLeader()
@@ -80,6 +93,11 @@ public class GameCameraController : Singleton<GameCameraController>
 
     private Vector3 GetAveragePosition()
     {
+        if (players == null || players.Length == 0)
+        {
+            return Vector3.zero;
+        }
+
         Vector3 averagePosition = Vector3.zero;
         foreach (GameObject player in players)
         {

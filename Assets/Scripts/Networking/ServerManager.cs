@@ -96,6 +96,7 @@ public class ServerManager : MonoBehaviour
             skierController.Unfreeze();
         }
         GameCameraController.Instance.UpdatePlayerList();
+        SnowCameraController.Instance.UpdatePlayerList();
     }
 
     // Update is called once per frame

@@ -192,7 +192,7 @@ public class PhysicsSkierController : MonoBehaviour
             if (!m_isCarving && Time.time > m_startCarvingLastTime + 1f)
             {
                 m_startCarvingLastTime = Time.time;
-                carvingStartBoost = 1f;//m_accelerometer.GetDeltaX();
+                carvingStartBoost = 1f;
             }
             m_isCarving = true;
         }
@@ -200,7 +200,6 @@ public class PhysicsSkierController : MonoBehaviour
         {
             m_isCarving = false;
         }
-
 
         // Base the movement direction on camera / slope / carving inputs
         Vector3 moveDirection = new Vector3(m_carvingDirectionInfluence * carvingInput, 0f, 1f);
