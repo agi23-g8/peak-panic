@@ -363,12 +363,11 @@ MonoBehaviour:
   m_inertiaFactor: 30
   m_additionalGravity: 100
   m_sidewaysDrag: 50
-  m_accelerometer: {fileID: 0}
   m_networkPlayer: {fileID: 0}
   m_carvingDetectionThreshold: 0.06
   m_carvingDirectionInfluence: 2
-  m_carvingSpeedInfluence: 3
-  m_carvingStartBoost: 15
+  m_carvingSpeedInfluence: 4
+  m_carvingStartBoost: 20
   m_jumpDetectionThreshold: 0.7
   m_jumpPower: 35
   m_jumpLandingBoost: 185

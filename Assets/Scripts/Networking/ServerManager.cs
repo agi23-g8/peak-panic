@@ -121,12 +121,13 @@ public class ServerManager : Singleton<ServerManager>
         gameStarted = true;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (NetworkManager.Singleton.IsServer)
-            Debug.Log("Number of clients connected: " + NetworkManager.Singleton.ConnectedClientsList.Count);
-
+        // Uncomment this to log how many players are connected (this will spam the console every frame)
+        // if (NetworkManager.Singleton.IsServer)
+        // {
+        //     Debug.Log("Number of clients connected: " + NetworkManager.Singleton.ConnectedClientsList.Count);
+        // }
 
         if (gameStarted)
         {

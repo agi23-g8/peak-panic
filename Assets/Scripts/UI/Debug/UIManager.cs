@@ -23,7 +23,7 @@ public class UIManager : Singleton<UIManager>
     [SerializeField]
     private Button executePhysicsButton;
 
-    private bool hasServerStarted;
+    // private bool hasServerStarted;
 
     private void Awake()
     {
@@ -82,10 +82,9 @@ public class UIManager : Singleton<UIManager>
             Logger.Instance.LogInfo($"{id} just connected...");
         };
 
-        NetworkManager.Singleton.OnServerStarted += () =>
-        {
-            hasServerStarted = true;
-        };
-
+        // NetworkManager.Singleton.OnServerStarted += () =>
+        // {
+        //     hasServerStarted = true;
+        // };
     }
 }

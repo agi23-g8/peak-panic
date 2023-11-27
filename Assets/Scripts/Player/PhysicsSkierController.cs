@@ -34,10 +34,7 @@ public class PhysicsSkierController : MonoBehaviour
     private float m_sidewaysDrag = 50f;
 
     [SerializeField]
-    [Tooltip("The game object responsible for retrieving and pre-processing the inputs from the accelerometer.")]
-    private MobileAccelerometer m_accelerometer;
-
-    [SerializeField]
+    [Tooltip("The game object used to access accelerometer inputs from the phone.")]
     private NetworkPlayer m_networkPlayer;
 
 

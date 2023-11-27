@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7359051783328727949}
   - component: {fileID: 2268760434432227288}
   - component: {fileID: 6691652886394005797}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: JumpRamp
   m_TagString: Jump
   m_Icon: {fileID: 0}

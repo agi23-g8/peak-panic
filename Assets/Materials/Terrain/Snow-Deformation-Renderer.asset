@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
-  m_Name: Terrain Depth Only
+  m_Name: Terrain Depth
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    passTag: Terrain Depth Only
+    passTag: Terrain Depth
     Event: 300
     filterSettings:
       RenderQueueType: 0
@@ -22,7 +22,7 @@ MonoBehaviour:
         serializedVersion: 2
         m_Bits: 8
       PassNames:
-      - DepthOnly
+      - TerrainDepth
     overrideMaterial: {fileID: 0}
     overrideMaterialPassIndex: 0
     overrideShader: {fileID: 0}
