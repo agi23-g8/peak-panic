@@ -320,7 +320,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_target: {fileID: 1765007276}
   m_heightOffset: 10
-  m_deformationArea: 90
+  m_deformationArea: 100
 --- !u!114 &12066351
 MonoBehaviour:
   m_ObjectHideFlags: 0

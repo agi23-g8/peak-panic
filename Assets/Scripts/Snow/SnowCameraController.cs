@@ -13,9 +13,9 @@ public class SnowCameraController : Singleton<SnowCameraController>
     private float m_heightOffset = 10f;
 
     [SerializeField]
-    [Range(10f, 100f)]
+    [Range(10f, 150f)]
     [Tooltip("The length, in meters, of the deformation area captured by the camera.")]
-    private float m_deformationArea = 60f;
+    private float m_deformationArea = 80f;
 
     private Camera m_snowCamera;
     private int m_terrainLayer;
