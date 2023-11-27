@@ -70,18 +70,16 @@ public class ServerManager : Singleton<ServerManager>
         GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
         // Instantiate the Player object
 
-        for (int i = 0; i < 10; i++)
-        {
 
-            Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
-            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-            // Keep track of the player
-            playerMap.Add(player, networkPlayer);
-            players.Add(player);
+        Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
+        GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+        // Keep track of the player
+        playerMap.Add(player, networkPlayer);
+        players.Add(player);
 
-            PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
-            skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
-        }
+        PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
+        skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
+
     }
 
     void OnClientDisconnected(ulong clientID)
