@@ -6,8 +6,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System;
+using TMPro;
+using Unity.Collections;
 
-public class ServerManager : MonoBehaviour
+public class ServerManager : Singleton<ServerManager>
 {
 
     [SerializeField]
@@ -19,7 +21,9 @@ public class ServerManager : MonoBehaviour
     // A map from NetworkPlayer to Player 
     private Dictionary<GameObject, GameObject> playerMap = new Dictionary<GameObject, GameObject>();
 
-    private List<GameObject> players = new List<GameObject>();
+    public List<GameObject> players = new List<GameObject>();
+
+    public bool gameStarted = false;
 
     // Start is called before the first frame update
     async void Start()
@@ -28,6 +32,7 @@ public class ServerManager : MonoBehaviour
         startGameButton?.onClick.AddListener(() =>
         {
             StartGame();
+            startGameButton.gameObject.SetActive(false);
         });
 
         if (RelayManager.Instance.IsRelayEnabled)
@@ -49,6 +54,8 @@ public class ServerManager : MonoBehaviour
         {
             Debug.Log("Something went wrong! This is not a server!");
         }
+
+        StartCoroutine(SetPlayerNames());
     }
 
     // private void OnClientConnected(ulong clientId) => Debug.Log($"=> OnClientConnected({clientId})");
@@ -63,16 +70,18 @@ public class ServerManager : MonoBehaviour
         GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
         // Instantiate the Player object
 
+        for (int i = 0; i < 10; i++)
+        {
 
-        Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
-        GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
-        // Keep track of the player
-        playerMap.Add(networkPlayer, player);
-        players.Add(player);
+            Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
+            GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+            // Keep track of the player
+            playerMap.Add(player, networkPlayer);
+            players.Add(player);
 
-        PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
-        skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
-
+            PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
+            skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
+        }
     }
 
     void OnClientDisconnected(ulong clientID)
@@ -95,8 +104,7 @@ public class ServerManager : MonoBehaviour
             PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
             skierController.Unfreeze();
         }
-        GameCameraController.Instance.UpdatePlayerList();
-        SnowCameraController.Instance.UpdatePlayerList();
+        gameStarted = true;
     }
 
     // Update is called once per frame
@@ -104,5 +112,43 @@ public class ServerManager : MonoBehaviour
     {
         if (NetworkManager.Singleton.IsServer)
             Debug.Log("Number of clients connected: " + NetworkManager.Singleton.ConnectedClientsList.Count);
+
+
+        if (gameStarted)
+        {
+            CullPlayers();
+        }
     }
+
+    // Every second, set the player names
+    IEnumerator SetPlayerNames()
+    {
+        while (true)
+        {
+            foreach (GameObject player in players)
+            {
+                GameObject networkPlayer = playerMap[player];
+                TMP_Text text = player.GetComponentInChildren<TMP_Text>();
+                if (text != null)
+                    text.text = networkPlayer.GetComponent<NetworkPlayer>().GetPlayerName();
+            }
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+
+    void CullPlayers()
+    {
+        foreach (GameObject player in players)
+        {
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(player.transform.position);
+            if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0 || screenPos.y > Screen.height)
+            {
+                // player is off screen
+                players.Remove(player);
+                Destroy(player);
+            }
+        }
+    }
+
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SnowCameraController : Singleton<SnowCameraController>
@@ -18,7 +19,7 @@ public class SnowCameraController : Singleton<SnowCameraController>
 
     private Camera m_snowCamera;
     private int m_terrainLayer;
-    private GameObject[] players;
+    private List<GameObject> players => ServerManager.Instance.players;
 
     void Start()
     {
@@ -43,7 +44,7 @@ public class SnowCameraController : Singleton<SnowCameraController>
         Shader.SetGlobalVector("_PrevSnowDeformationOrigin", previousCamOrigin);
 
         // Makes the camera follow the current leader at a constant height above the terrain.
-        if (players != null && players.Length > 0)
+        if (players != null && players.Count > 0)
         {
             m_target = FindCurrentLeader();
             Vector3 camPosition = m_target.position;
@@ -92,7 +93,7 @@ public class SnowCameraController : Singleton<SnowCameraController>
 
     private Vector3 GetAveragePosition()
     {
-        if (players == null || players.Length == 0)
+        if (players == null || players.Count == 0)
         {
             return Vector3.zero;
         }
@@ -103,14 +104,9 @@ public class SnowCameraController : Singleton<SnowCameraController>
             averagePosition += player.transform.position;
 
         }
-        averagePosition /= players.Length;
+        averagePosition /= players.Count;
 
         return averagePosition;
     }
 
-    public void UpdatePlayerList()
-    {
-        players = GameObject.FindGameObjectsWithTag("Player");
-        Debug.Log("Number of players: " + players.Length);
-    }
 }

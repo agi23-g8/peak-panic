@@ -4,7 +4,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
-public class UIScriptManager : MonoBehaviour
+public class UIScriptManager : Singleton<UIScriptManager>
 {
     [Header("UI Screens")]
     public GameObject[] uiScreenElements;

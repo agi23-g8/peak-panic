@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameCameraController : Singleton<GameCameraController>
@@ -27,7 +28,7 @@ public class GameCameraController : Singleton<GameCameraController>
 
     private int m_terrainLayer;
 
-    private GameObject[] players;
+    private List<GameObject> players => ServerManager.Instance.players;
 
     private void Start()
     {
@@ -36,7 +37,7 @@ public class GameCameraController : Singleton<GameCameraController>
 
     private void Update()
     {
-        if (players == null || players.Length == 0)
+        if (players == null || players.Count == 0 || !ServerManager.Instance.gameStarted)
         {
             return;
         }
@@ -44,14 +45,14 @@ public class GameCameraController : Singleton<GameCameraController>
         // Compute target transform to follow the object
         m_objectToFollow = FindCurrentLeader();
         Vector3 targetPosition = m_objectToFollow.position;
-        targetPosition.x = GetAveragePosition().x;
 
         // Offset the camera to see the player from behind
         Vector3 offset = m_camOffset;
         offset = m_objectToFollow.right * offset.x + m_objectToFollow.up * offset.y + m_objectToFollow.forward * offset.z;
         targetPosition += offset;
 
-        Quaternion targetRotation = Quaternion.LookRotation(m_objectToFollow.position - transform.position);
+        Vector3 averagePosition = GetAveragePosition();
+        Quaternion targetRotation = Quaternion.LookRotation(averagePosition - transform.position);
 
         // Raycast down to find the terrain height at the target position
         RaycastHit hit;
@@ -68,23 +69,21 @@ public class GameCameraController : Singleton<GameCameraController>
         float rotationBlendWeight = Mathf.Clamp(m_rotationBlend * Time.deltaTime, 0f, 1f);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationBlendWeight);
 
-        // Prevent camera from yaw and roll
-        //transform.rotation = Quaternion.Euler(transform.eulerAngles.x, 0f, 0f);
+        // Prevent camera from roll
+        transform.rotation = Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, 0f);
     }
 
     private Transform FindCurrentLeader()
     {
-        // which player is in the lead?
-        // which player has the largest z value?
-        // return that player's transform
+        // which player has the lowest y
 
-        float maxZ = -Mathf.Infinity;
+        float maxY = Mathf.Infinity;
         Transform leader = players[0].transform;
         foreach (GameObject player in players)
         {
-            if (player.transform.position.z > maxZ)
+            if (player.transform.position.y < maxY)
             {
-                maxZ = player.transform.position.z;
+                maxY = player.transform.position.y;
                 leader = player.transform;
             }
         }
@@ -93,7 +92,7 @@ public class GameCameraController : Singleton<GameCameraController>
 
     private Vector3 GetAveragePosition()
     {
-        if (players == null || players.Length == 0)
+        if (players == null || players.Count == 0)
         {
             return Vector3.zero;
         }
@@ -104,15 +103,8 @@ public class GameCameraController : Singleton<GameCameraController>
             averagePosition += player.transform.position;
 
         }
-        averagePosition /= players.Length;
+        averagePosition /= players.Count;
 
         return averagePosition;
     }
-
-    public void UpdatePlayerList()
-    {
-        players = GameObject.FindGameObjectsWithTag("Player");
-        Debug.Log("Number of players: " + players.Length);
-    }
-
 }

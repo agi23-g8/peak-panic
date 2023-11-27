@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,11 +13,11 @@ public class NetworkPlayer : NetworkBehaviour
         writePerm: NetworkVariableWritePermission.Owner
     );
 
-    // public NetworkVariable<string> playerName = new NetworkVariable<string>(
-    //     string.Empty,
-    //     readPerm: NetworkVariableReadPermission.Everyone,
-    //     writePerm: NetworkVariableWritePermission.Owner
-    // );
+    public NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>(
+        string.Empty,
+        readPerm: NetworkVariableReadPermission.Everyone,
+        writePerm: NetworkVariableWritePermission.Owner
+    );
 
     private Vector3 prevAccelerometerInput;
 
@@ -43,6 +44,8 @@ public class NetworkPlayer : NetworkBehaviour
             Logger.Instance.LogInfo("I am the owner");
 
             accelerometer.Value = Vector3.zero;
+
+            playerName.Value = UIScriptManager.Instance.nameInputField.text;
 
             if (Accelerometer.current == null)
             {
@@ -122,5 +125,9 @@ public class NetworkPlayer : NetworkBehaviour
         return accelerometer.Value.z;
     }
 
+    public string GetPlayerName()
+    {
+        return playerName.Value.ToString();
+    }
 
 }
