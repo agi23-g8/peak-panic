@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class SnowCameraController : MonoBehaviour
+public class SnowCameraController : Singleton<SnowCameraController>
 {
     [SerializeField]
     [Tooltip("The target transform that the camera will follow.")]
@@ -12,12 +13,13 @@ public class SnowCameraController : MonoBehaviour
     private float m_heightOffset = 10f;
 
     [SerializeField]
-    [Range(10f, 100f)]
+    [Range(10f, 150f)]
     [Tooltip("The length, in meters, of the deformation area captured by the camera.")]
-    private float m_deformationArea = 60f;
+    private float m_deformationArea = 80f;
 
     private Camera m_snowCamera;
     private int m_terrainLayer;
+    private List<GameObject> players => ServerManager.Instance.players;
 
     void Start()
     {
@@ -41,10 +43,14 @@ public class SnowCameraController : MonoBehaviour
         Vector3 previousCamOrigin = transform.position;
         Shader.SetGlobalVector("_PrevSnowDeformationOrigin", previousCamOrigin);
 
-        if (m_target != null)
+        // Makes the camera follow the current leader at a constant height above the terrain.
+        if (players != null && players.Count > 0)
         {
-            // The camera follows the target at a constant height above the terrain.
+            m_target = FindCurrentLeader();
             Vector3 camPosition = m_target.position;
+
+            Vector3 avgPosition = GetAveragePosition();
+            camPosition.x = avgPosition.x;
 
             RaycastHit hit;
             if (Physics.Raycast(camPosition, Vector3.down, out hit, 50f, m_terrainLayer))
@@ -66,4 +72,41 @@ public class SnowCameraController : MonoBehaviour
         Vector3 originOffset = (currentCamOrigin - previousCamOrigin) / m_deformationArea;
         Shader.SetGlobalVector("_SnowDeformationOriginOffset", originOffset);
     }
+
+    private Transform FindCurrentLeader()
+    {
+        // which player is in the lead?
+        // which player has the largest z value?
+        // return that player's transform
+        float maxZ = -Mathf.Infinity;
+        Transform leader = players[0].transform;
+        foreach (GameObject player in players)
+        {
+            if (player.transform.position.z > maxZ)
+            {
+                maxZ = player.transform.position.z;
+                leader = player.transform;
+            }
+        }
+        return leader;
+    }
+
+    private Vector3 GetAveragePosition()
+    {
+        if (players == null || players.Count == 0)
+        {
+            return Vector3.zero;
+        }
+
+        Vector3 averagePosition = Vector3.zero;
+        foreach (GameObject player in players)
+        {
+            averagePosition += player.transform.position;
+
+        }
+        averagePosition /= players.Count;
+
+        return averagePosition;
+    }
+
 }
