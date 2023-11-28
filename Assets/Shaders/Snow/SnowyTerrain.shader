@@ -701,11 +701,11 @@ Shader "Snow/SnowyTerrain"
             ENDHLSL
         }
 
-        // DEPTH ONLY PASS
+        // DEPTH PASS
         Pass
         {
-            Name "DepthOnly"
-            Tags { "LightMode" = "DepthOnly" }
+            Name "TerrainDepth"
+            Tags { "LightMode" = "TerrainDepth" }
 
             // -------------------------------------
             // Fixed states

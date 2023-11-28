@@ -34,8 +34,8 @@ public class PhysicsSkierController : MonoBehaviour
     private float m_sidewaysDrag = 50f;
 
     [SerializeField]
-    [Tooltip("The game object responsible for retrieving and pre-processing the inputs from the accelerometer.")]
-    private MobileAccelerometer m_accelerometer;
+    [Tooltip("The game object used to access accelerometer inputs from the phone.")]
+    private NetworkPlayer m_networkPlayer;
 
 
     // _____________________________________________________
@@ -117,7 +117,8 @@ public class PhysicsSkierController : MonoBehaviour
         m_startCarvingLastTime = Time.time;
 
         m_rigidBody = GetComponent<Rigidbody>();
-        m_rigidBody.freezeRotation = true;
+        // m_rigidBody.freezeRotation = true;
+        Freeze();
 
         Collider collider = GetComponent<Collider>();
         m_skierHeight = collider.bounds.size.y;
@@ -147,49 +148,54 @@ public class PhysicsSkierController : MonoBehaviour
         float jumpLandingBoost = 0f;
         float carvingStartBoost = 0f;
 
-        if (m_accelerometer != null && m_accelerometer.IsReady())
+        if (m_networkPlayer == null)
         {
-            // JUMP
-            // Trigger jump action based on the change rate of the pitch angle (tilting) of the phone.
-            // The pitch angle represents the rotation around the device's side-to-side axis.
-            // A detection threshold is used to smooth the movement and limit false positives.
-            float deltaY = -m_accelerometer.GetDeltaY();
-            if (deltaY > m_jumpDetectionThreshold && Time.time > m_jumpLastTime + 1f)
-            {
-                jumpInput = deltaY;
-                m_jumpLastTime = Time.time;
-                m_jumpLastInput = jumpInput;
-            }
+            return;
+        }
 
-            // Request boost on landing
-            if (!m_isGrounded && m_jumpLastInput > 0f)
-            {
-                jumpLandingBoost = m_jumpLastInput;
-                m_jumpLastInput = 0f;
-            }
-            m_isGrounded = true;
+        // JUMP
+        // Trigger jump action based on the change rate of the pitch angle (tilting) of the phone.
+        // The pitch angle represents the rotation around the device's side-to-side axis.
+        // A detection threshold is used to smooth the movement and limit false positives.
 
-            // CARVING
-            // Start carving action based on the current rolling angle of the phone.
-            // The rolling angle refers to the rotation around the forward axis of the device.
-            // A detection threshold is used to smooth the movement and limit false positives.
-            float inputX = m_accelerometer.GetX();
-            if (Mathf.Abs(inputX) > m_carvingDetectionThreshold)
-            {
-                carvingInput = inputX;
+        // TODO: Get the delta Y from the network player
+        float deltaY = 0;
 
-                // Request boost when starting to carve
-                if (!m_isCarving && Time.time > m_startCarvingLastTime + 1f)
-                {
-                    m_startCarvingLastTime = Time.time;
-                    carvingStartBoost = 1f;//m_accelerometer.GetDeltaX();
-                }
-                m_isCarving = true;
-            }
-            else
+        if (deltaY > m_jumpDetectionThreshold && Time.time > m_jumpLastTime + 1f)
+        {
+            jumpInput = deltaY;
+            m_jumpLastTime = Time.time;
+            m_jumpLastInput = jumpInput;
+        }
+
+        // Request boost on landing
+        if (!m_isGrounded && m_jumpLastInput > 0f)
+        {
+            jumpLandingBoost = m_jumpLastInput;
+            m_jumpLastInput = 0f;
+        }
+        m_isGrounded = true;
+
+        // CARVING
+        // Start carving action based on the current rolling angle of the phone.
+        // The rolling angle refers to the rotation around the forward axis of the device.
+        // A detection threshold is used to smooth the movement and limit false positives.
+        float inputX = m_networkPlayer.GetX();
+        if (Mathf.Abs(inputX) > m_carvingDetectionThreshold)
+        {
+            carvingInput = inputX;
+
+            // Request boost when starting to carve
+            if (!m_isCarving && Time.time > m_startCarvingLastTime + 1f)
             {
-                m_isCarving = false;
+                m_startCarvingLastTime = Time.time;
+                carvingStartBoost = 1f;
             }
+            m_isCarving = true;
+        }
+        else
+        {
+            m_isCarving = false;
         }
 
         // Base the movement direction on camera / slope / carving inputs
@@ -341,4 +347,21 @@ public class PhysicsSkierController : MonoBehaviour
             m_onJumpRamp = false;
         }
     }
+
+    public void SetNetworkPlayer(NetworkPlayer networkPlayer)
+    {
+        m_networkPlayer = networkPlayer;
+    }
+
+    public void Freeze()
+    {
+        m_rigidBody.constraints = RigidbodyConstraints.FreezeAll;
+    }
+
+    public void Unfreeze()
+    {
+        m_rigidBody.constraints = RigidbodyConstraints.FreezeRotation;
+    }
+
+
 }
