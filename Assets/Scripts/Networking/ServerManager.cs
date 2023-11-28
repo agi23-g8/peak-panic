@@ -20,6 +20,12 @@ public class ServerManager : Singleton<ServerManager>
     [SerializeField]
     private Button startGameButton;
 
+    [SerializeField]
+    private UICountdown countdown;
+
+    [SerializeField]
+    private int countdownTime = 5;
+
     // A map from NetworkPlayer to Player 
     private Dictionary<GameObject, GameObject> playerMap = new Dictionary<GameObject, GameObject>();
 
@@ -29,6 +35,8 @@ public class ServerManager : Singleton<ServerManager>
 
     private async void Start()
     {
+        countdown.ResetCountdown();
+
         // START SERVER
         startGameButton?.onClick.AddListener(() =>
         {
@@ -114,13 +122,16 @@ public class ServerManager : Singleton<ServerManager>
         menuScreen.SetActive(false);
 
         // Start countdown
-        
-        foreach (GameObject player in players)
-        {
-            PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
-            skierController.Unfreeze();
-        }
-        gameStarted = true;
+        countdown.NewCountDown(countdownTime, () => {
+            Debug.Log("Game started!");
+
+            foreach (GameObject player in players)
+            {
+                PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
+                skierController.Unfreeze();
+            }
+            gameStarted = true;
+        });
     }
 
     // Every second, set the player names
