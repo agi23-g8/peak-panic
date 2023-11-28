@@ -83,6 +83,13 @@ public class UIScriptManager : Singleton<UIScriptManager>
             return;
         }
 
+        if (name.Length > 10)
+        {
+            messagePopup.Show("Name must be 10 characters or less", messagePopupDuration);
+            Debug.Log("Name must be 10 characters or less!");
+            return;
+        }
+
         Debug.Log($"{name} is attempting to connect to game with code {code}...");
 
         joinButtonText.text = "Connecting...";
@@ -95,7 +102,6 @@ public class UIScriptManager : Singleton<UIScriptManager>
 
     private async void Connect(string code)
     {
-
         if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(code))
         {
             await RelayManager.Instance.JoinRelay(code);
@@ -108,14 +114,13 @@ public class UIScriptManager : Singleton<UIScriptManager>
             Debug.Log("Connected to server!");
             Logger.Instance.LogInfo("Connected to server!");
             Next();
+            return;
         }
-        else
-        {
-            messagePopup.Show("Failed to connect to server", messagePopupDuration);
 
-            Debug.Log("Failed to connect");
-            joinButtonText.text = "Join";
-        }
+        // if no return, we failed.
+        messagePopup.Show("Failed to connect to server", messagePopupDuration);
+        Debug.Log("Failed to connect");
+        joinButtonText.text = "Join";
     }
 
     // IEnumerator SetNetworkPlayerName(string name)
