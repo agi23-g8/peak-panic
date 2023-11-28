@@ -1,28 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System;
 using TMPro;
-using Unity.Collections;
 
 public class ServerManager : Singleton<ServerManager>
 {
-
     [SerializeField]
     private GameObject playerPrefab;
 
     [SerializeField]
-    private Button startGameButton;
+    private GameObject menuScreen;
 
     [SerializeField]
     private GameObject joinCode;
 
     [SerializeField]
-    private GameObject qrCodeImage;
+    private Button startGameButton;
 
     // A map from NetworkPlayer to Player 
     private Dictionary<GameObject, GameObject> playerMap = new Dictionary<GameObject, GameObject>();
@@ -31,16 +27,12 @@ public class ServerManager : Singleton<ServerManager>
 
     public bool gameStarted = false;
 
-    // Start is called before the first frame update
-    async void Start()
+    private async void Start()
     {
         // START SERVER
         startGameButton?.onClick.AddListener(() =>
         {
             StartGame();
-            startGameButton.gameObject.SetActive(false);
-            joinCode.SetActive(false);
-            qrCodeImage.SetActive(false);
         });
 
         RelayHostData hostData;
@@ -74,8 +66,13 @@ public class ServerManager : Singleton<ServerManager>
         StartCoroutine(SetPlayerNames());
     }
 
-    // private void OnClientConnected(ulong clientId) => Debug.Log($"=> OnClientConnected({clientId})");
-
+    private void Update()
+    {
+        if (gameStarted)
+        {
+            CullPlayers();
+        }
+    }
 
     private void OnClientConnected(ulong clientID)
     {
@@ -98,7 +95,7 @@ public class ServerManager : Singleton<ServerManager>
 
     }
 
-    void OnClientDisconnected(ulong clientID)
+    private void OnClientDisconnected(ulong clientID)
     {
         // find the NetworkPlayer object
         GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
@@ -110,9 +107,14 @@ public class ServerManager : Singleton<ServerManager>
     }
 
 
-    public void StartGame()
+    private void StartGame()
     {
-        // START GAME when all players have joined
+        // Hide menu UI
+        startGameButton.gameObject.SetActive(false);
+        menuScreen.SetActive(false);
+
+        // Start countdown
+        
         foreach (GameObject player in players)
         {
             PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
@@ -121,22 +123,8 @@ public class ServerManager : Singleton<ServerManager>
         gameStarted = true;
     }
 
-    void Update()
-    {
-        // Uncomment this to log how many players are connected (this will spam the console every frame)
-        // if (NetworkManager.Singleton.IsServer)
-        // {
-        //     Debug.Log("Number of clients connected: " + NetworkManager.Singleton.ConnectedClientsList.Count);
-        // }
-
-        if (gameStarted)
-        {
-            CullPlayers();
-        }
-    }
-
     // Every second, set the player names
-    IEnumerator SetPlayerNames()
+    private IEnumerator SetPlayerNames()
     {
         while (true)
         {
@@ -151,8 +139,7 @@ public class ServerManager : Singleton<ServerManager>
         }
     }
 
-
-    void CullPlayers()
+    private void CullPlayers()
     {
         foreach (GameObject player in players)
         {
