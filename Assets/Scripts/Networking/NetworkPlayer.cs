@@ -45,7 +45,7 @@ public class NetworkPlayer : NetworkBehaviour
 
             accelerometer.Value = Vector3.zero;
 
-            playerName.Value = UIScriptManager.Instance.nameInputField.text;
+            playerName.Value = ClientUIManager.Instance.nameInputField.text;
 
             if (Accelerometer.current == null)
             {
