@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -125,11 +126,10 @@ public class ClientUIManager : Singleton<ClientUIManager>
         // user wants to disconnect
         actionConfirmPopup.HideEarly();
 
-        // TODO: disconnect from server
-
-        // go back to the first screen
-        Next();
-        joinButtonText.text = "Join";
+        // disconnect from server
+        // this will trigger OnNetworkDespawn on the NetworkPlayer
+        // which in turn will make the UI go back to the first screen
+        NetworkManager.Singleton.Shutdown();
     }
 
     /// <summary>
@@ -161,6 +161,16 @@ public class ClientUIManager : Singleton<ClientUIManager>
         messagePopup.Show("Failed to connect to server", messagePopupDuration);
         Debug.Log("Failed to connect");
         joinButtonText.text = "Join";
+    }
+
+    /// <summary>
+    /// Triggered from NetworkPlayer when it is despawned. Lost connection to server
+    /// </summary>
+    public void OnNetworkDespawn()
+    {
+        Next();
+        joinButtonText.text = "Join";
+        messagePopup.Show("Lost connection to server", messagePopupDuration + 2f);
     }
 
     // IEnumerator SetNetworkPlayerName(string name)

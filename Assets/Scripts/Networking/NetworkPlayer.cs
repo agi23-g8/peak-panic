@@ -31,6 +31,19 @@ public class NetworkPlayer : NetworkBehaviour
 
     private float lowPassFilterFactor;
 
+    public override void OnNetworkDespawn()
+    {
+        if (IsClient)
+        {
+            Logger.Instance.LogInfo("NetworkPlayer despawned on client");
+            Debug.Log("NetworkPlayer despawned on client");
+
+            // this is only called on the webgl client from the NetworkedPlayer
+            // notify ui manager that we have despawned
+            ClientUIManager.Instance.OnNetworkDespawn();
+        }
+    }
+
     public override void OnNetworkSpawn()
     {
         if (IsClient)

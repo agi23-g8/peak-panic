@@ -29,6 +29,10 @@ public class ServerManager : Singleton<ServerManager>
     // A map from NetworkPlayer to Player 
     private Dictionary<GameObject, GameObject> playerMap = new Dictionary<GameObject, GameObject>();
 
+    // A map from player ID to Player
+    private Dictionary<ulong, GameObject> playerIdMap = new Dictionary<ulong, GameObject>();
+
+    // List of Players
     public List<GameObject> players = new List<GameObject>();
 
     public bool gameStarted = false;
@@ -97,6 +101,7 @@ public class ServerManager : Singleton<ServerManager>
         // Keep track of the player
         playerMap.Add(player, networkPlayer);
         players.Add(player);
+        playerIdMap.Add(clientID, player);
 
         PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
         skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
@@ -105,13 +110,18 @@ public class ServerManager : Singleton<ServerManager>
 
     private void OnClientDisconnected(ulong clientID)
     {
-        // find the NetworkPlayer object
-        GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
-        // Destroy the Player object
-        Destroy(playerMap[networkPlayer]);
-        // Remove the player from the map
-        playerMap.Remove(networkPlayer);
-        players.Remove(networkPlayer);
+        Debug.Log("Client disconnected: " + clientID);
+
+        GameObject temp = playerIdMap[clientID];
+
+        // removes the player object from scene
+        Destroy(playerIdMap[clientID]);
+
+        // update the map
+        playerIdMap.Remove(clientID);
+
+        // update the list
+        players.Remove(temp);
     }
 
 

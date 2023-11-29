@@ -19,7 +19,7 @@ public class SnowCameraController : Singleton<SnowCameraController>
 
     private Camera m_snowCamera;
     private int m_terrainLayer;
-    private List<GameObject> players => ServerManager.Instance.players;
+    private List<GameObject> players;
 
     void Start()
     {
@@ -42,6 +42,8 @@ public class SnowCameraController : Singleton<SnowCameraController>
         // Set '_PrevSnowDeformationOrigin' shader variable
         Vector3 previousCamOrigin = transform.position;
         Shader.SetGlobalVector("_PrevSnowDeformationOrigin", previousCamOrigin);
+
+        players = ServerManager.Instance.players;
 
         // Makes the camera follow the current leader at a constant height above the terrain.
         if (players != null && players.Count > 0)
@@ -79,6 +81,14 @@ public class SnowCameraController : Singleton<SnowCameraController>
         // which player has the largest z value?
         // return that player's transform
         float maxZ = -Mathf.Infinity;
+
+        // make sure there are players
+        if (players == null || players.Count == 0)
+        {
+            // no leader was found.
+            return null;
+        }
+
         Transform leader = players[0].transform;
         foreach (GameObject player in players)
         {
