@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Threading.Tasks;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class UIScriptManager : Singleton<UIScriptManager>
+public class ClientUIManager : Singleton<ClientUIManager>
 {
     [Header("UI Screens")]
     public GameObject[] uiScreenElements;
@@ -15,11 +14,18 @@ public class UIScriptManager : Singleton<UIScriptManager>
     public TMP_Text joinButtonText;
     public TMP_Text playmodeInfoText;
     public TMP_Text playmodeName;
+    public Button disconnectButton;
+
+    [Header("UI Popups")]
 
     public GameObject messagePopupPrefab;
+    public GameObject actionConfirmPopupPrefab;
+
     public float messagePopupDuration = 2.5f;
+    public float actionConfirmPopupDuration = 4.0f;
 
     private UIMessagePopup messagePopup;
+    private UIMessagePopup actionConfirmPopup;
 
     private void Start()
     {
@@ -32,6 +38,9 @@ public class UIScriptManager : Singleton<UIScriptManager>
 
         messagePopup = messagePopupPrefab.GetComponent<UIMessagePopup>();
         messagePopupPrefab.SetActive(false);
+
+        actionConfirmPopup = actionConfirmPopupPrefab.GetComponent<UIMessagePopup>();
+        actionConfirmPopupPrefab.SetActive(false);
     }
 
     /// <summary>
@@ -98,6 +107,37 @@ public class UIScriptManager : Singleton<UIScriptManager>
 
         playmodeName.text = name;
         // StartCoroutine(SetNetworkPlayerName(name));
+    }
+
+    /// <summary>
+    /// Called when user presses the arrow button in the top left on the Play Mode screen.
+    /// </summary>
+    public void DisconnectButton()
+    {
+        actionConfirmPopup.Show("Do you want to leave the game?", actionConfirmPopupDuration);
+    }
+
+    /// <summary>
+    /// Called from pressing Yes on the Disconnect confirmation popup.
+    /// </summary>
+    public void DisconnectConfirm()
+    {
+        // user wants to disconnect
+        actionConfirmPopup.HideEarly();
+
+        // TODO: disconnect from server
+
+        // go back to the first screen
+        Next();
+        joinButtonText.text = "Join";
+    }
+
+    /// <summary>
+    /// Called from pressing No on the Disconnect confirmation popup.
+    /// </summary>
+    public void DisconnectCancel()
+    {
+        actionConfirmPopup.HideEarly();
     }
 
     private async void Connect(string code)
