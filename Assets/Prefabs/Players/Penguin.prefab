@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1297238624141803960}
   - component: {fileID: 5977167872122688007}
   m_Layer: 0
-  m_Name: christmasHat
+  m_Name: ChristmasHat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 3096659511120981362}
   - component: {fileID: 3610504389397981617}
   m_Layer: 6
-  m_Name: skiSticks
+  m_Name: SkiSticks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -179,7 +179,7 @@ GameObject:
   - component: {fileID: 3479213664302723000}
   - component: {fileID: 2084789653854060071}
   m_Layer: 6
-  m_Name: skis
+  m_Name: Skis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -566,7 +566,7 @@ GameObject:
   - component: {fileID: 8578508518272370521}
   - component: {fileID: 6432343926089158008}
   m_Layer: 6
-  m_Name: mitten
+  m_Name: Mitten
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

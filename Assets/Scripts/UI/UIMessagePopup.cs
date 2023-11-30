@@ -6,11 +6,16 @@ public class UIMessagePopup : MonoBehaviour
 {
     public TextMeshProUGUI messageText;
 
-    public void Show(string text, float duration)
+    public void Show(string text, float seconds)
     {
         gameObject.SetActive(true);
         messageText.text = text;
-        StartCoroutine(HideAfterSeconds(duration));
+        StartCoroutine(HideAfterSeconds(seconds));
+    }
+
+    public void HideEarly()
+    {
+        gameObject.SetActive(false);
     }
 
     private IEnumerator HideAfterSeconds(float seconds)
