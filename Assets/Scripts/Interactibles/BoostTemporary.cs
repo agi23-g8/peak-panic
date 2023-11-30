@@ -15,30 +15,47 @@ public class BoostTemporary : MonoBehaviour
     private void Start()
     {
         triggerRenderer = GetComponent<Renderer>();
-        if (triggerRenderer)
-            triggerRenderer.enabled = true; // Verify that the renderer is enabled
-    }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (canBoost && Time.time >= cooldownEndTime && other.CompareTag("Player"))
+        if (triggerRenderer)
         {
-            StartCoroutine(ActivateBoost(other.GetComponent<Rigidbody>()));
-            canBoost = false;
-            cooldownEndTime = Time.time + cooldownDuration;
-            if (triggerRenderer)
-                triggerRenderer.enabled = false;
+            // All temp boosts are visible at the beginning
+            triggerRenderer.enabled = true;
         }
     }
 
-    IEnumerator ActivateBoost(Rigidbody rb)
+    private void OnTriggerEnter(Collider _other)
     {
-        rb.AddForce(transform.forward * boostForce, ForceMode.VelocityChange);
+        if (canBoost && _other.CompareTag("Player") && Time.time >= cooldownEndTime)
+        {
+            Transform playerTransform = _other.GetComponent<Transform>();
+            Rigidbody playerRigidBody = _other.GetComponent<Rigidbody>();
+            StartCoroutine(ActivateBoost(playerTransform, playerRigidBody));
+
+            cooldownEndTime = Time.time + cooldownDuration;
+            canBoost = false;
+
+            if (triggerRenderer)
+            {
+                // The boost disappears after it is used
+                triggerRenderer.enabled = false;
+            }
+        }
+    }
+
+    IEnumerator ActivateBoost(Transform _transform, Rigidbody _rigidBody)
+    {
+        // Temporary boost doesn't alter the player's direction, only its speed
+        _rigidBody.AddForce(_transform.forward * boostForce, ForceMode.VelocityChange);
+
+        // We wait for the boost duration to end
         yield return new WaitForSeconds(boostDuration);
-        // The boost reappears after the cooldown duration
         canBoost = true;
+
         if (triggerRenderer)
+        {
+            // The boost reappears after the cooldown duration
             triggerRenderer.enabled = true; 
+        }
     }
 }
 
