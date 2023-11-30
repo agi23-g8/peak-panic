@@ -7,19 +7,22 @@ public class BoostPermanent : MonoBehaviour
     public float boostForce = 20f;
     public float boostDuration = 3f;
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider _other)
     {
-        if (other.CompareTag("Player"))
+        if (_other.CompareTag("Player"))
         {
-            StartCoroutine(ActivateBoost(other.GetComponent<Rigidbody>()));
+            Rigidbody rigidBody = _other.GetComponent<Rigidbody>();
+            StartCoroutine(ActivateBoost(rigidBody));
         }
     }
 
-    IEnumerator ActivateBoost(Rigidbody rb)
+    IEnumerator ActivateBoost(Rigidbody _rigidBody)
     {
-        rb.AddForce(transform.forward * boostForce, ForceMode.VelocityChange);
-        yield return new WaitForSeconds(boostDuration);
+        // Permanent boost overrides the player's direction
+        _rigidBody.AddForce(transform.forward * boostForce, ForceMode.VelocityChange);
+
         // We wait for the boost duration to end
+        yield return new WaitForSeconds(boostDuration);
     }
 }
 
