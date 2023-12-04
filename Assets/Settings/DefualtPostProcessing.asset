@@ -92,6 +92,7 @@ MonoBehaviour:
   - {fileID: -7893295128165547882}
   - {fileID: -7011558710299706105}
   - {fileID: 5482587975649577333}
+  - {fileID: 3097750025012961437}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -132,6 +133,40 @@ MonoBehaviour:
   maxNits:
     m_OverrideState: 0
     m_Value: 1000
+--- !u!114 &3097750025012961437
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 238381e65cb27e74ca4b271fcc4acf96, type: 3}
+  m_Name: VolumetricEffectComponent
+  m_EditorClassIdentifier: 
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.365
+  scattering:
+    m_OverrideState: 1
+    m_Value: 0.406
+  marchSteps:
+    m_OverrideState: 1
+    m_Value: 32
+  maxDistance:
+    m_OverrideState: 1
+    m_Value: 75
+  jitter:
+    m_OverrideState: 1
+    m_Value: 250
+  gaussBlurAmount:
+    m_OverrideState: 1
+    m_Value: 1
+  gaussBlurSamples:
+    m_OverrideState: 1
+    m_Value: 5
 --- !u!114 &5482587975649577333
 MonoBehaviour:
   m_ObjectHideFlags: 3
