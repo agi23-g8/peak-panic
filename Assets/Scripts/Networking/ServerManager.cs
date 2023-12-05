@@ -174,4 +174,20 @@ public class ServerManager : Singleton<ServerManager>
         }
     }
 
+    /// <summary>
+    /// Ends the gameplay session, and returns to the "main menu".
+    /// </summary>
+    public void EndGame()
+    {
+        Debug.Log("TODO: reset the game and players");
+    }
+
+    /// <summary>
+    /// Returns the current number of players which is playing (not eliminated yet).
+    /// </summary>
+    /// <returns></returns>
+    public int GetActivePlayers()
+    {
+        return players.Count;
+    }
 }
