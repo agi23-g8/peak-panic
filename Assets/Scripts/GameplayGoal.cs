@@ -47,10 +47,11 @@ public class GameplayGoal : MonoBehaviour
             // add player to stack
             finished.Push(other.gameObject);
 
-            AddPlayerPositionUI(finished.Count);
+            string name = ServerManager.Instance.GetPlayerDisplayName(other.gameObject);
+            AddPlayerPositionUI(finished.Count, name);
 
             // disable player movement
-            other.gameObject.GetComponent<PhysicsSkierController>().enabled = false;
+            ServerManager.Instance.SetPlayerSkiControllerActive(other.gameObject, false);
 
             bool hasAllFinished = GetActivePlayers();
 
@@ -72,14 +73,14 @@ public class GameplayGoal : MonoBehaviour
         return false;
     }
 
-    private void AddPlayerPositionUI(int position)
+    private void AddPlayerPositionUI(int position, string name)
     {
         // instantiate UI element under the container
         GameObject uiElement = Instantiate(UIPlayerPositionPrefab, positionsContainer.transform);
         UIPlayerPositionElement ui = uiElement.GetComponent<UIPlayerPositionElement>();
 
         // TODO: get actual player name
-        ui.SetPlayerName("Player");
+        ui.SetPlayerName(name);
         ui.SetPlayerPosition(position);
     }
 
