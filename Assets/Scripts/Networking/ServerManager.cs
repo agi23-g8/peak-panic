@@ -9,6 +9,9 @@ using TMPro;
 public class ServerManager : Singleton<ServerManager>
 {
     [SerializeField]
+    private Transform cameraStartPos;
+
+    [SerializeField]
     private GameObject playerPrefab;
 
     [SerializeField]
@@ -21,12 +24,15 @@ public class ServerManager : Singleton<ServerManager>
     private Button startGameButton;
 
     [SerializeField]
+    private Button resetGameButton;
+
+    [SerializeField]
     private UICountdown countdown;
 
     [SerializeField]
     private int countdownTime = 5;
 
-    // A map from NetworkPlayer to Player 
+    // A map from Player to NetworkPlayer 
     private Dictionary<GameObject, GameObject> playerMap = new Dictionary<GameObject, GameObject>();
 
     // A map from player ID to Player
@@ -34,6 +40,9 @@ public class ServerManager : Singleton<ServerManager>
 
     // List of Players
     public List<GameObject> players = new List<GameObject>();
+
+    // Map with active players, this list is cleared when the game ends and populated when the game starts
+    private Dictionary<GameObject, bool> activePlayers = new Dictionary<GameObject, bool>();
 
     public bool gameStarted = false;
 
@@ -44,8 +53,20 @@ public class ServerManager : Singleton<ServerManager>
         // START SERVER
         startGameButton?.onClick.AddListener(() =>
         {
+            if (NetworkManager.Singleton.ConnectedClientsList.Count == 0)
+            {
+                return;
+            }
+
             StartGame();
         });
+
+        resetGameButton?.onClick.AddListener(() =>
+        {
+            EndGame();
+            resetGameButton.gameObject.SetActive(false);
+        });
+        resetGameButton.gameObject.SetActive(false);
 
         RelayHostData hostData;
         if (RelayManager.Instance.IsRelayEnabled)
@@ -116,14 +137,21 @@ public class ServerManager : Singleton<ServerManager>
 
         // removes the player object from scene
         Destroy(playerIdMap[clientID]);
-
-        // update the map
         playerIdMap.Remove(clientID);
 
-        // update the list
-        players.Remove(temp);
-    }
+        // remove the networked player
+        Destroy(playerMap[temp]);
+        playerMap.Remove(temp);
 
+        // remove from player list
+        players.Remove(temp);
+
+        // if all players have disconnected and game is going, end the game
+        if (players.Count == 0 && gameStarted)
+        {
+            resetGameButton.gameObject.SetActive(true);
+        }
+    }
 
     private void StartGame()
     {
@@ -140,6 +168,13 @@ public class ServerManager : Singleton<ServerManager>
                 PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
                 skierController.Unfreeze();
             }
+
+            // set all players to active
+            foreach (GameObject player in players)
+            {
+                activePlayers.Add(player, true);
+            }
+
             gameStarted = true;
         });
     }
@@ -167,11 +202,77 @@ public class ServerManager : Singleton<ServerManager>
             Vector3 screenPos = Camera.main.WorldToScreenPoint(player.transform.position);
             if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0 || screenPos.y > Screen.height)
             {
-                // player is off screen
-                players.Remove(player);
-                Destroy(player);
+                activePlayers[player] = false;
+                player.SetActive(false);
             }
         }
     }
 
+    /// <summary>
+    /// Ends the gameplay session, and returns to the "main menu".
+    /// </summary>
+    public void EndGame()
+    {
+        GameplayGoal.Instance.ResetGoal();
+
+        resetGameButton.gameObject.SetActive(false);
+
+        activePlayers.Clear();
+
+        gameStarted = false;
+
+        SpawnPointManager.Instance.ResetSpawnPoints();
+
+        // Show menu UI
+        startGameButton.gameObject.SetActive(true);
+        menuScreen.SetActive(true);
+
+        // Reset players
+        foreach (GameObject player in players)
+        {
+            player.SetActive(true);
+            Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
+            player.transform.position = spawnPoint.position;
+            player.transform.rotation = spawnPoint.rotation;
+
+            SetPlayerSkiControllerActive(player, true);
+
+            PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
+            skierController.Freeze();
+
+            Debug.Log("Resetting player: " + GetPlayerDisplayName(player));
+        }
+
+        // reset camera
+        Camera.main.transform.position = cameraStartPos.position;
+        Camera.main.transform.rotation = cameraStartPos.rotation;
+    }
+
+    /// <summary>
+    /// Returns the current number of players which is playing (not eliminated yet).
+    /// </summary>
+    /// <returns></returns>
+    public int GetActivePlayers()
+    {
+        // go through active players and count them
+        int count = 0;
+        foreach (KeyValuePair<GameObject, bool> player in activePlayers)
+        {
+            if (player.Value)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public string GetPlayerDisplayName(GameObject player)
+    {
+        return playerMap[player].GetComponent<NetworkPlayer>().GetPlayerName();
+    }
+
+    public void SetPlayerSkiControllerActive(GameObject gameObject, bool active)
+    {
+        gameObject.GetComponent<PhysicsSkierController>().enabled = active;
+    }
 }
