@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameplayGoal : MonoBehaviour
+public class GameplayGoal : Singleton<GameplayGoal>
 {
     // stack with players that has reached the goal
     private readonly Stack<GameObject> finished = new Stack<GameObject>();
@@ -25,7 +26,6 @@ public class GameplayGoal : MonoBehaviour
 
         goAgainButton.onClick.AddListener(() =>
         {
-            ResetGoal();
             ServerManager.Instance.EndGame();
         });
     }

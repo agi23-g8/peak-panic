@@ -213,6 +213,8 @@ public class ServerManager : Singleton<ServerManager>
     /// </summary>
     public void EndGame()
     {
+        GameplayGoal.Instance.ResetGoal();
+
         resetGameButton.gameObject.SetActive(false);
 
         activePlayers.Clear();
