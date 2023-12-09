@@ -7,80 +7,77 @@ public class CameraManager : Singleton<CameraManager>
     // _____________________________________________________________________
     // Internal members
     private CinemachineVirtualCamera m_virtualCamera;
+    private CinemachineTrackedDolly m_trackedDolly;
     private List<GameObject> m_players => ServerManager.Instance.players;
-    private Vector3 m_averagePlayerPos;
-    private Transform m_leaderPlayer;
+    private bool m_raceStarted => ServerManager.Instance.gameStarted;
 
 
     // _____________________________________________________________________
-    // Exposed read-only members
-    public Vector3 AveragePlayerPosition
-    {
-        get { return m_averagePlayerPos; }
-    }
-
-    public Vector3 LeaderPlayerPosition
-    {
-        get { return m_leaderPlayer.position; }
-    }
-
-
-    // _____________________________________________________________________
-    // Lifecycle
+    // Component lifecycle
     private void Start()
     {
-        // Gets CinemachineVirtualCamera component from the GameObject
+        // Get CinemachineVirtualCamera component from GameObject
         m_virtualCamera = GetComponent<CinemachineVirtualCamera>();
 
         Debug.Assert(m_virtualCamera != null,
             "CameraManager must be attached to a GameObject with a CinemachineVirtualCamera component.");
 
-        m_averagePlayerPos = m_virtualCamera.Follow.position;
-        m_leaderPlayer = m_virtualCamera.Follow;
+        // Get CinemachineTrackedDolly component from virtuql camera
+        m_trackedDolly = m_virtualCamera.GetCinemachineComponent<CinemachineTrackedDolly>();
     }
 
     private void Update()
     {
         // Early discards if the race has not started yet
-        if (m_players == null || m_players.Count == 0 || !ServerManager.Instance.gameStarted)
+        if (m_players == null || m_players.Count == 0 || !m_raceStarted)
         {
             return;
         }
 
-        // Detects leader player based on altitude
-        {
-            float maxY = Mathf.Infinity;
-            Transform leader = m_players[0].transform;
+        // Make the dolly camera follow the leader player
+        float maxY = Mathf.Infinity;
+        Transform leader = m_players[0].transform;
 
-            foreach (GameObject player in m_players)
+        foreach (GameObject player in m_players)
+        {
+            if (player.transform.position.y < maxY)
             {
-                if (player.transform.position.y < maxY)
-                {
-                    maxY = player.transform.position.y;
-                    leader = player.transform;
-                }
+                maxY = player.transform.position.y;
+                leader = player.transform;
             }
-
-            m_leaderPlayer = leader;
         }
 
-        // Recomputes average player position
+        m_virtualCamera.Follow = leader;
+    }
+
+
+    // _____________________________________________________________________
+    // Exposed methods
+
+    // @brief Returns the position halfway between the camera and the 
+    // follow target (leader player) projected along the camera path.
+    public Vector3 GetViewCenteredPositionOnPath()
+    {
+        if (m_trackedDolly == null)
         {
-            Vector3 averagePosition = Vector3.zero;
-            foreach (GameObject player in m_players)
-            {
-                averagePosition += player.transform.position;
-
-            }
-            averagePosition /= m_players.Count;
-            m_averagePlayerPos = averagePosition;
+            return Vector3.zero;
         }
 
-        // Updates Cinemachine virtual camera target
-        if (m_virtualCamera != null)
-        {
-            m_virtualCamera.Follow = m_leaderPlayer;
-            m_virtualCamera.LookAt = m_leaderPlayer;
-        }
+        // Apply half position offset along the path
+        float pathPosition = m_trackedDolly.m_PathPosition - 0.5f * m_trackedDolly.m_AutoDolly.m_PositionOffset;
+
+        // Retrieve corresponding transform on path
+        Vector3 worldPosition = m_trackedDolly.m_Path.EvaluatePositionAtUnit(pathPosition, m_trackedDolly.m_PositionUnits);
+        Quaternion worldOrientation = m_trackedDolly.m_Path.EvaluateOrientationAtUnit(pathPosition, m_trackedDolly.m_PositionUnits);
+
+        // Compute horizontal offset from path
+        Vector3 offsetX = worldOrientation * Vector3.right;
+        Vector3 offsetZ = worldOrientation * Vector3.forward;
+
+        // Apply half horizontal offset from path
+        worldPosition += 0.5f * m_trackedDolly.m_PathOffset.x * offsetX;
+        worldPosition += 0.5f * m_trackedDolly.m_PathOffset.z * offsetZ;
+
+        return worldPosition;
     }
 }
