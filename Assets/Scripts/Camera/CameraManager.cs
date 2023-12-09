@@ -22,7 +22,7 @@ public class CameraManager : Singleton<CameraManager>
         Debug.Assert(m_virtualCamera != null,
             "CameraManager must be attached to a GameObject with a CinemachineVirtualCamera component.");
 
-        // Get CinemachineTrackedDolly component from virtuql camera
+        // Get CinemachineTrackedDolly component from virtual camera
         m_trackedDolly = m_virtualCamera.GetCinemachineComponent<CinemachineTrackedDolly>();
     }
 
