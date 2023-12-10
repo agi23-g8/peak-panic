@@ -12,6 +12,9 @@ public class ServerManager : Singleton<ServerManager>
     private GameObject playerPrefab;
 
     [SerializeField]
+    private ColorPool skinPresets;
+
+    [SerializeField]
     private GameObject menuScreen;
 
     [SerializeField]
@@ -111,19 +114,28 @@ public class ServerManager : Singleton<ServerManager>
 
         // find the NetworkPlayer object
         GameObject networkPlayer = NetworkManager.Singleton.ConnectedClients[clientID].PlayerObject.gameObject;
+
         // Instantiate the Player object
-
-
         Transform spawnPoint = SpawnPointManager.Instance.GetSpawnPoint();
         GameObject player = Instantiate(playerPrefab, spawnPoint.position, spawnPoint.rotation);
+
         // Keep track of the player
         playerMap.Add(player, networkPlayer);
         players.Add(player);
         playerIdMap.Add(clientID, player);
 
+        // Link the accelerometer to the player controller
         PhysicsSkierController skierController = player.GetComponent<PhysicsSkierController>();
         skierController.SetNetworkPlayer(networkPlayer.GetComponent<NetworkPlayer>());
 
+        if (skinPresets != null)
+        {
+            // Update the player skin color
+            Color skinColor = skinPresets.PullColor();
+            Renderer playerRenderer = player.GetComponent<Renderer>();
+            playerRenderer.material.SetColor("_SkinColor", skinColor);
+            // networkPlayer.GetComponent<NetworkPlayer>().skinColor.Value = skinColor;
+        }
     }
 
     private void OnClientDisconnected(ulong clientID)
