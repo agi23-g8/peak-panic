@@ -25,8 +25,6 @@ public class Gate : MonoBehaviour
         {
             pillars.Add(child.gameObject);
         }
-
-        LowerGate();
     }
 
     public void LowerGate()

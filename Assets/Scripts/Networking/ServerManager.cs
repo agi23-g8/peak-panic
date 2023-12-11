@@ -56,10 +56,10 @@ public class ServerManager : Singleton<ServerManager>
         // START SERVER
         startGameButton?.onClick.AddListener(() =>
         {
-            // if (NetworkManager.Singleton.ConnectedClientsList.Count == 0)
-            // {
-            //     return;
-            // }
+            if (NetworkManager.Singleton.ConnectedClientsList.Count == 0)
+            {
+                return;
+            }
 
             StartGame();
         });
