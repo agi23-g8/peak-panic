@@ -134,7 +134,7 @@ public class ServerManager : Singleton<ServerManager>
             Color skinColor = skinPresets.PullColor();
             Renderer playerRenderer = player.GetComponent<Renderer>();
             playerRenderer.material.SetColor("_SkinColor", skinColor);
-            // networkPlayer.GetComponent<NetworkPlayer>().skinColor.Value = skinColor;
+            networkPlayer.GetComponent<NetworkPlayer>().skinColor.Value = skinColor;
         }
     }
 
