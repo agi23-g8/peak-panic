@@ -151,7 +151,7 @@ MonoBehaviour:
   initialsize: 0
   growingFactor: 0.001
   minimalSpeed: 1
-  slowForce: 1
+  slowForce: 15
   slowDuration: 3
   lifeTime: 20
 --- !u!135 &3122621350586568323
