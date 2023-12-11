@@ -65,7 +65,10 @@ public class NetworkPlayer : NetworkBehaviour
             accelerometer.Value = Vector3.zero;
 
             playerName.Value = ClientUIManager.Instance.nameInputField.text;
-            // ClientUIManager.Instance.backgroundColor.color = skinColor.Value;
+           skinColor.OnValueChanged += (prevValue, newValue) =>
+            {
+                ClientUIManager.Instance.backgroundColor.color = newValue;
+            };
 
             if (Accelerometer.current == null)
             {
