@@ -148,13 +148,13 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.9
+    m_Value: 1
   scattering:
     m_OverrideState: 1
-    m_Value: 0.98
+    m_Value: 0.998
   marchSteps:
     m_OverrideState: 1
-    m_Value: 7
+    m_Value: 20
   maxDistance:
     m_OverrideState: 1
     m_Value: 75
