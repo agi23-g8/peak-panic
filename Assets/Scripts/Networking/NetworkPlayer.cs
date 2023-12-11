@@ -19,6 +19,12 @@ public class NetworkPlayer : NetworkBehaviour
         writePerm: NetworkVariableWritePermission.Owner
     );
 
+    public NetworkVariable<Color> skinColor = new NetworkVariable<Color>(
+        Color.black,
+        readPerm: NetworkVariableReadPermission.Everyone,
+        writePerm: NetworkVariableWritePermission.Server
+    );
+
     private Vector3 prevAccelerometerInput;
 
     [Header("Low Pass filter Settings")]
@@ -59,6 +65,10 @@ public class NetworkPlayer : NetworkBehaviour
             accelerometer.Value = Vector3.zero;
 
             playerName.Value = ClientUIManager.Instance.nameInputField.text;
+           skinColor.OnValueChanged += (prevValue, newValue) =>
+            {
+                ClientUIManager.Instance.backgroundColor.color = newValue;
+            };
 
             if (Accelerometer.current == null)
             {
