@@ -96,6 +96,13 @@ public class ServerManager : Singleton<ServerManager>
             Debug.Log("Something went wrong! This is not a server!");
         }
 
+        if (skinPresets != null)
+        {
+            // Reset the skin color preset pool
+            skinPresets.ShuffleColors();
+            skinPresets.ResetPool();
+        }
+
         StartCoroutine(SetPlayerNames());
     }
 

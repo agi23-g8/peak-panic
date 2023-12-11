@@ -112,7 +112,7 @@ public class ColorPool : ScriptableObject
     }
 
     /// @brief Shuffle the color array using Fisher-Yates unbiased shuffling algorithm.
-    private void ShuffleColors()
+    public void ShuffleColors()
     {
         int n = m_colors.Count;
         for (int i = n - 1; i > 0; i--)
