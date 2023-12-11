@@ -32,6 +32,9 @@ public class ServerManager : Singleton<ServerManager>
     [SerializeField]
     private int countdownTime = 5;
 
+    [SerializeField]
+    private Gate gate;
+
     // A map from Player to NetworkPlayer 
     private Dictionary<GameObject, GameObject> playerMap = new Dictionary<GameObject, GameObject>();
 
@@ -53,10 +56,10 @@ public class ServerManager : Singleton<ServerManager>
         // START SERVER
         startGameButton?.onClick.AddListener(() =>
         {
-            if (NetworkManager.Singleton.ConnectedClientsList.Count == 0)
-            {
-                return;
-            }
+            // if (NetworkManager.Singleton.ConnectedClientsList.Count == 0)
+            // {
+            //     return;
+            // }
 
             StartGame();
         });
@@ -169,7 +172,8 @@ public class ServerManager : Singleton<ServerManager>
         menuScreen.SetActive(false);
 
         // Start countdown
-        countdown.NewCountDown(countdownTime, () => {
+        countdown.NewCountDown(countdownTime, () =>
+        {
             Debug.Log("Game started!");
 
             foreach (GameObject player in players)
@@ -186,6 +190,9 @@ public class ServerManager : Singleton<ServerManager>
 
             gameStarted = true;
         });
+
+        gate.LowerGate();
+
     }
 
     // Every second, set the player names
