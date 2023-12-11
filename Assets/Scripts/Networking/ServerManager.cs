@@ -9,9 +9,6 @@ using TMPro;
 public class ServerManager : Singleton<ServerManager>
 {
     [SerializeField]
-    private Transform cameraStartPos;
-
-    [SerializeField]
     private GameObject playerPrefab;
 
     [SerializeField]
@@ -242,10 +239,6 @@ public class ServerManager : Singleton<ServerManager>
 
             Debug.Log("Resetting player: " + GetPlayerDisplayName(player));
         }
-
-        // reset camera
-        Camera.main.transform.position = cameraStartPos.position;
-        Camera.main.transform.rotation = cameraStartPos.rotation;
     }
 
     /// <summary>

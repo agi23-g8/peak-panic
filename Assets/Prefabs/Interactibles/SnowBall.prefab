@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 7148220649135441314}
   - component: {fileID: 9069903946126894157}
   - component: {fileID: 6351414262267557549}
+  - component: {fileID: 3122621350586568323}
   - component: {fileID: 4663248907160590523}
   - component: {fileID: 7808981469490756541}
-  - component: {fileID: 3122621350586568323}
   m_Layer: 6
   m_Name: SnowBall
   m_TagString: Untagged
@@ -108,6 +108,27 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &3122621350586568323
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3165702408517328564}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &4663248907160590523
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -153,25 +174,4 @@ MonoBehaviour:
   minimalSpeed: 1
   slowForce: 15
   slowDuration: 3
-  lifeTime: 20
---- !u!135 &3122621350586568323
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3165702408517328564}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  lifeTime: 15
