@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4663248907160590523}
   - component: {fileID: 7808981469490756541}
   - component: {fileID: 3122621350586568323}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SnowBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31c081a51d848a944a08f859f86311d8, type: 2}
+  - {fileID: 2100000, guid: 30e833a222ef1a08e95138582dd739ac, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -151,8 +151,7 @@ MonoBehaviour:
   initialsize: 0
   growingFactor: 0.001
   minimalSpeed: 1
-  initialSpeed: 50
-  slowForce: 30
+  slowForce: 1
   slowDuration: 3
   lifeTime: 20
 --- !u!135 &3122621350586568323
