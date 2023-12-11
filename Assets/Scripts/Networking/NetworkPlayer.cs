@@ -22,7 +22,7 @@ public class NetworkPlayer : NetworkBehaviour
     public NetworkVariable<Color> skinColor = new NetworkVariable<Color>(
         Color.black,
         readPerm: NetworkVariableReadPermission.Everyone,
-        writePerm: NetworkVariableWritePermission.Owner
+        writePerm: NetworkVariableWritePermission.Server
     );
 
     private Vector3 prevAccelerometerInput;
