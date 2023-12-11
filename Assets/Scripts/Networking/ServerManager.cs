@@ -41,6 +41,8 @@ public class ServerManager : Singleton<ServerManager>
     {
         countdown.ResetCountdown();
 
+        AudioManager.Instance.Play("Wind");
+
         // START SERVER
         startGameButton?.onClick.AddListener(() =>
         {
@@ -132,7 +134,8 @@ public class ServerManager : Singleton<ServerManager>
         menuScreen.SetActive(false);
 
         // Start countdown
-        countdown.NewCountDown(countdownTime, () => {
+        countdown.NewCountDown(countdownTime, () =>
+        {
             Debug.Log("Game started!");
 
             foreach (GameObject player in players)
