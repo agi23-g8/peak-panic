@@ -1,67 +1,50 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SnowCameraController : Singleton<SnowCameraController>
+public class SnowCameraController : MonoBehaviour
 {
+    // _____________________________________________________________________
+    // Exposed properties
     [SerializeField]
-    [Tooltip("The target transform that the camera will follow.")]
-    private Transform m_target;
+    [Range(10f, 200f)]
+    [Tooltip("The horizontal size, in meters, of the deformation volume captured by the camera.")]
+    private float m_deformationArea = 100f;
 
     [SerializeField]
-    [Range(1f, 50f)]
-    [Tooltip("The height, in meters, from which the camera captures the terrain deformation.")]
-    private float m_heightOffset = 10f;
+    [Range(10f, 200f)]
+    [Tooltip("The vertical size, in meters, of the deformation volume captured by the camera")]
+    private float m_deformationHeight = 50f;
 
-    [SerializeField]
-    [Range(10f, 150f)]
-    [Tooltip("The length, in meters, of the deformation area captured by the camera.")]
-    private float m_deformationArea = 80f;
 
+    // _____________________________________________________________________
+    // Internal members
     private Camera m_snowCamera;
-    private int m_terrainLayer;
-    private List<GameObject> players;
 
+
+    // _____________________________________________________________________
+    // Component lifecycle
     void Start()
     {
         // Get Camera component from the GameObject
         m_snowCamera = GetComponent<Camera>();
-        Debug.Assert(m_snowCamera != null, "SnowCameraController script must be attached to a GameObject with a Camera component.");
 
-        // Fetch terrain layer index
-        m_terrainLayer = 1 << LayerMask.NameToLayer("Terrain");
+        Debug.Assert(m_snowCamera != null,
+            "SnowCameraController script must be attached to a GameObject with a Camera component.");
     }
 
     private void Update()
     {
         // Override camera projection settings
         m_snowCamera.orthographic = true;
-        m_snowCamera.nearClipPlane = 0f;
-        m_snowCamera.farClipPlane = m_heightOffset * 2f;
-        m_snowCamera.orthographicSize = m_deformationArea * 0.5f;
+        m_snowCamera.nearClipPlane = -0.5f * m_deformationHeight;
+        m_snowCamera.farClipPlane = 0.5f * m_deformationHeight;
+        m_snowCamera.orthographicSize = 0.5f * m_deformationArea;
 
         // Set '_PrevSnowDeformationOrigin' shader variable
         Vector3 previousCamOrigin = transform.position;
         Shader.SetGlobalVector("_PrevSnowDeformationOrigin", previousCamOrigin);
 
-        players = ServerManager.Instance.players;
-
-        // Makes the camera follow the current leader at a constant height above the terrain.
-        if (players != null && players.Count > 0)
-        {
-            m_target = FindCurrentLeader();
-            Vector3 camPosition = m_target.position;
-
-            Vector3 avgPosition = GetAveragePosition();
-            camPosition.x = avgPosition.x;
-
-            RaycastHit hit;
-            if (Physics.Raycast(camPosition, Vector3.down, out hit, 50f, m_terrainLayer))
-            {
-                camPosition.y = hit.point.y + m_heightOffset;
-            }
-
-            transform.position = camPosition;
-        }
+        // Update the camera position based on the main camera view state.
+        transform.position = CameraManager.Instance.GetViewCenteredPositionOnPath();
 
         // Set '_CurSnowDeformationOrigin' shader variable
         Vector3 currentCamOrigin = transform.position;
@@ -73,50 +56,6 @@ public class SnowCameraController : Singleton<SnowCameraController>
         // Set '_SnowDeformationOriginOffset' shader variable
         Vector3 originOffset = (currentCamOrigin - previousCamOrigin) / m_deformationArea;
         Shader.SetGlobalVector("_SnowDeformationOriginOffset", originOffset);
-    }
-
-    private Transform FindCurrentLeader()
-    {
-        // which player is in the lead?
-        // which player has the largest z value?
-        // return that player's transform
-        float maxZ = -Mathf.Infinity;
-
-        // make sure there are players
-        if (players == null || players.Count == 0)
-        {
-            // no leader was found.
-            return null;
-        }
-
-        Transform leader = players[0].transform;
-        foreach (GameObject player in players)
-        {
-            if (player.transform.position.z > maxZ)
-            {
-                maxZ = player.transform.position.z;
-                leader = player.transform;
-            }
-        }
-        return leader;
-    }
-
-    private Vector3 GetAveragePosition()
-    {
-        if (players == null || players.Count == 0)
-        {
-            return Vector3.zero;
-        }
-
-        Vector3 averagePosition = Vector3.zero;
-        foreach (GameObject player in players)
-        {
-            averagePosition += player.transform.position;
-
-        }
-        averagePosition /= players.Count;
-
-        return averagePosition;
     }
 
 }

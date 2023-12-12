@@ -15,6 +15,7 @@ public class ClientUIManager : Singleton<ClientUIManager>
     public TMP_Text joinButtonText;
     public TMP_Text playmodeInfoText;
     public TMP_Text playmodeName;
+    public Image backgroundColor;
     public Button disconnectButton;
 
     [Header("UI Popups")]
