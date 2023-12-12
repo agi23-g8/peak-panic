@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class ServerManager : Singleton<ServerManager>
 {
@@ -64,7 +65,6 @@ public class ServerManager : Singleton<ServerManager>
         resetGameButton?.onClick.AddListener(() =>
         {
             EndGame();
-            resetGameButton.gameObject.SetActive(false);
         });
         resetGameButton.gameObject.SetActive(false);
 
@@ -90,6 +90,7 @@ public class ServerManager : Singleton<ServerManager>
         {
             NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+            NetworkManager.Singleton.OnServerStopped += OnServerStopped;
         }
         else
         {
@@ -106,12 +107,39 @@ public class ServerManager : Singleton<ServerManager>
         StartCoroutine(SetPlayerNames());
     }
 
+    private void OnServerStopped(bool obj)
+    {
+        Debug.LogWarning("Server stopped! Going back to title screen");
+
+        // make sure to destroy the network manager before reload scene
+        Destroy(gameObject);
+
+        SceneManager.LoadScene("title-screen");
+    }
+
     private void Update()
     {
         if (gameStarted)
         {
             CullPlayers();
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (gameStarted)
+            {
+                EndGame();
+            }
+            else
+            {
+                RestartServer();
+            }
+        }
+    }
+
+    private void RestartServer()
+    {
+        NetworkManager.Singleton.Shutdown();
     }
 
     private void OnClientConnected(ulong clientID)
@@ -220,6 +248,11 @@ public class ServerManager : Singleton<ServerManager>
             {
                 activePlayers[player] = false;
                 player.SetActive(false);
+
+                if (GetActivePlayers() == 0)
+                {
+                    resetGameButton.gameObject.SetActive(true);
+                }
             }
         }
     }
