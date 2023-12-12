@@ -120,7 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67694ebfb92bc774f961a015dbcbcb39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boostForce: 20
+  boostForce: 10
   boostDuration: 3
   cooldownDuration: 1
 --- !u!114 &5219858582624091602
