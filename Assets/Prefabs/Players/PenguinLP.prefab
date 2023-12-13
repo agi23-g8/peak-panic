@@ -471,6 +471,43 @@ MonoBehaviour:
   m_jumpPower: 35
   m_jumpLandingBoost: 185
   m_jumpFlipSpeed: 750
+  carvingSounds:
+  - name: 
+    clip: {fileID: 8300000, guid: f2486e9fc6391fe48b490466f049728b, type: 3}
+    volume: 1
+    volumeVariance: 0
+    pitch: 1
+    pitchVariance: 0.516
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: 
+    clip: {fileID: 8300000, guid: a49d7b1a18f0a7f408c0a61c7f21f478, type: 3}
+    volume: 1
+    volumeVariance: 0
+    pitch: 1
+    pitchVariance: 0.482
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: 
+    clip: {fileID: 8300000, guid: 3db428e380085ca44b87463d3e847097, type: 3}
+    volume: 1
+    volumeVariance: 0
+    pitch: 1
+    pitchVariance: 0.427
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: 
+    clip: {fileID: 8300000, guid: e034053d0f91c814fa60ecd33dd268c1, type: 3}
+    volume: 1
+    volumeVariance: 0.061
+    pitch: 1
+    pitchVariance: 0.499
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
 --- !u!1 &3844818804344148868
 GameObject:
   m_ObjectHideFlags: 0

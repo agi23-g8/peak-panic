@@ -51,8 +51,6 @@ public class ServerManager : Singleton<ServerManager>
     {
         countdown.ResetCountdown();
 
-        AudioManager.Instance.Play("Wind");
-
         // START SERVER
         startGameButton?.onClick.AddListener(() =>
         {
