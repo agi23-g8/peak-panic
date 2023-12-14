@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Collections;
+using System.Collections.Generic;
 
 public class PhysicsSkierController : MonoBehaviour
 {
@@ -89,6 +90,15 @@ public class PhysicsSkierController : MonoBehaviour
     [Tooltip("Controls the angular speed of the flip when jumping from a ramp.")]
     private float m_jumpFlipSpeed = 650f;
 
+    // _____________________________________________________
+    // Sound settings
+    [Header("Sound Settings")]
+
+    [SerializeField]
+    [Tooltip("The list of sounds that can be played when carving.")]
+    private List<Sound> carvingSounds = new List<Sound>();
+    private AudioSource currentCarvingSound;
+
 
     // _____________________________________________________
     // Internal members
@@ -103,6 +113,7 @@ public class PhysicsSkierController : MonoBehaviour
     private float m_jumpLastInput = 0f;
     private float m_jumpLastTime;
     private float m_startCarvingLastTime;
+    private bool m_justLanded = false;
 
 
     // _____________________________________________________
@@ -122,6 +133,43 @@ public class PhysicsSkierController : MonoBehaviour
 
         Collider collider = GetComponent<Collider>();
         m_skierHeight = collider.bounds.size.y;
+
+        currentCarvingSound = gameObject.AddComponent<AudioSource>();
+
+    }
+
+    private void Update()
+    {
+        PlayAudio();
+    }
+
+    void PlayAudio()
+    {
+        var speed = m_rigidBody.velocity.magnitude;
+
+        // Play the sound when carving
+        if ((m_isCarving || m_justLanded) && !currentCarvingSound.isPlaying && carvingSounds.Count > 0 && speed > 0.01f)
+        {
+            Sound sound = carvingSounds[Random.Range(0, carvingSounds.Count)];
+            currentCarvingSound.clip = sound.clip;
+            currentCarvingSound.volume = sound.volume;
+            currentCarvingSound.pitch = sound.pitch;
+            currentCarvingSound.spatialBlend = 0.5f;
+            currentCarvingSound.Play();
+            m_justLanded = false;
+        }
+
+        // Fade out the sound when not carving
+        if (!m_isCarving && currentCarvingSound.isPlaying)
+        {
+            currentCarvingSound.volume = Mathf.Lerp(currentCarvingSound.volume, 0f, 0.1f);
+        }
+
+        // Stop the sound when airborne
+        if (!m_isGrounded && currentCarvingSound.isPlaying)
+        {
+            currentCarvingSound.Stop();
+        }
     }
 
     private void FixedUpdate()
@@ -173,6 +221,7 @@ public class PhysicsSkierController : MonoBehaviour
         {
             jumpLandingBoost = m_jumpLastInput;
             m_jumpLastInput = 0f;
+            m_justLanded = true;
         }
         m_isGrounded = true;
 
