@@ -113,6 +113,7 @@ public class PhysicsSkierController : MonoBehaviour
     private float m_jumpLastInput = 0f;
     private float m_jumpLastTime;
     private float m_startCarvingLastTime;
+    private bool m_justLanded = false;
 
 
     // _____________________________________________________
@@ -147,7 +148,7 @@ public class PhysicsSkierController : MonoBehaviour
         var speed = m_rigidBody.velocity.magnitude;
 
         // Play the sound when carving
-        if (m_isCarving && !currentCarvingSound.isPlaying && carvingSounds.Count > 0 && speed > 0.01f)
+        if ((m_isCarving || m_justLanded) && !currentCarvingSound.isPlaying && carvingSounds.Count > 0 && speed > 0.01f)
         {
             Sound sound = carvingSounds[Random.Range(0, carvingSounds.Count)];
             currentCarvingSound.clip = sound.clip;
@@ -155,6 +156,7 @@ public class PhysicsSkierController : MonoBehaviour
             currentCarvingSound.pitch = sound.pitch;
             currentCarvingSound.spatialBlend = 0.5f;
             currentCarvingSound.Play();
+            m_justLanded = false;
         }
 
         // Fade out the sound when not carving
@@ -219,6 +221,7 @@ public class PhysicsSkierController : MonoBehaviour
         {
             jumpLandingBoost = m_jumpLastInput;
             m_jumpLastInput = 0f;
+            m_justLanded = true;
         }
         m_isGrounded = true;
 
