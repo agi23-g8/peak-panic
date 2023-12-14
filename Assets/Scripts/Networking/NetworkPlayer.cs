@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
@@ -7,6 +6,9 @@ using UnityEngine.InputSystem;
 
 public class NetworkPlayer : NetworkBehaviour
 {
+    [DllImport("__Internal")]
+    private static extern void Vibrate(int ms);
+
     public NetworkVariable<Vector3> accelerometer = new NetworkVariable<Vector3>(
         Vector3.zero,
         readPerm: NetworkVariableReadPermission.Everyone,
@@ -60,12 +62,12 @@ public class NetworkPlayer : NetworkBehaviour
 
         if (IsOwner)
         {
-            Logger.Instance.LogInfo("I am the owner");
+            Vibrate(1000);
 
             accelerometer.Value = Vector3.zero;
 
             playerName.Value = ClientUIManager.Instance.nameInputField.text;
-           skinColor.OnValueChanged += (prevValue, newValue) =>
+            skinColor.OnValueChanged += (prevValue, newValue) =>
             {
                 ClientUIManager.Instance.backgroundColor.color = newValue;
             };
@@ -87,18 +89,7 @@ public class NetworkPlayer : NetworkBehaviour
         // }
     }
 
-    public override void OnDestroy()
-    {
-        if (IsServer)
-        {
-            accelerometer.OnValueChanged -= OnAccelerometerChanged;
-        }
-    }
 
-    public void OnAccelerometerChanged(Vector3 prevValue, Vector3 newValue)
-    {
-        Debug.Log("Accelerometer changed from " + prevValue + " to " + newValue);
-    }
 
     void SetupAccelerometer()
     {
@@ -115,13 +106,20 @@ public class NetworkPlayer : NetworkBehaviour
             accelerometerInput = LowPassFilterAccelerometer(prevAccelerometerInput, accelerometerInput);
             accelerometer.Value = accelerometerInput;
             prevAccelerometerInput = accelerometerInput;
-            Logger.Instance.LogInfo("Accelerometer: " + accelerometer.Value);
         }
-        if (IsServer)
+
+    }
+
+    [ClientRpc]
+    public void VibrateClientRpc(int ms, ClientRpcParams clientRpcParams = default)
+    {
+        if (IsClient)
         {
-            // Debug.Log("Accelerometer: " + accelerometer.Value);
+            Logger.Instance.LogInfo("Vibrating for " + ms + "ms");
+            Vibrate(ms);
         }
     }
+
 
     Vector3 LowPassFilterAccelerometer(Vector3 prevValue, Vector3 newValue)
     {

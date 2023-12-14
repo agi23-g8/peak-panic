@@ -1,5 +1,6 @@
 using UnityEngine;
 using Unity.Collections;
+using Unity.VisualScripting;
 
 public class PhysicsSkierController : MonoBehaviour
 {
@@ -90,6 +91,12 @@ public class PhysicsSkierController : MonoBehaviour
     private float m_jumpFlipSpeed = 650f;
 
 
+    [Header("Vibration Settings")]
+    [SerializeField]
+    [Range(1000f, 5000f)]
+    [Tooltip("Controls the duration of the vibration (ms). 1000ms is the minimum duration that works (apparently).)")]
+    private int m_vibrationDuration = 1001;
+
     // _____________________________________________________
     // Internal members
 
@@ -103,6 +110,7 @@ public class PhysicsSkierController : MonoBehaviour
     private float m_jumpLastInput = 0f;
     private float m_jumpLastTime;
     private float m_startCarvingLastTime;
+    private float m_vibrationCooldown = 0f;
 
 
     // _____________________________________________________
@@ -122,6 +130,24 @@ public class PhysicsSkierController : MonoBehaviour
 
         Collider collider = GetComponent<Collider>();
         m_skierHeight = collider.bounds.size.y;
+    }
+
+    void Update()
+    {
+        var speed = m_rigidBody.velocity.magnitude;
+        if (m_isCarving)
+        {
+            if (m_vibrationCooldown <= 0f && speed > 0.1f)
+            {
+                m_vibrationCooldown = m_vibrationDuration / 1000f;
+                m_networkPlayer.VibrateClientRpc(m_vibrationDuration);
+            }
+        }
+        else if (!m_isCarving)
+        {
+            m_vibrationCooldown -= Time.deltaTime;
+        }
+
     }
 
     private void FixedUpdate()
