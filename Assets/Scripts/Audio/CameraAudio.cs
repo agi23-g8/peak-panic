@@ -19,6 +19,8 @@ public class CameraAudio : MonoBehaviour
 
     private int previousMusicIndex = -1;
 
+    private bool muteMusic = false;
+
     void Start()
     {
         windAudioSource = gameObject.AddComponent<AudioSource>();
@@ -29,6 +31,12 @@ public class CameraAudio : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //if m is pressed
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            muteMusic = !muteMusic;
+        }
+
         if (!windAudioSource.isPlaying)
         {
             windAudioSource.clip = windSound.clip;
@@ -51,6 +59,13 @@ public class CameraAudio : MonoBehaviour
             musicAudioSource.loop = musicSound.loop;
             musicAudioSource.Play();
         }
-
+        if (muteMusic)
+        {
+            musicAudioSource.volume = 0;
+        }
+        else
+        {
+            musicAudioSource.volume = musicVolume;
+        }
     }
 }
