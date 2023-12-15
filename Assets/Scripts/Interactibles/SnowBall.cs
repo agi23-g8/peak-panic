@@ -20,7 +20,7 @@ public class SnowBall : MonoBehaviour
     private Renderer triggerRenderer;
     private float timer = 0f;
 
-    public float lifeTime = 10f;
+    public float lifeTime = 20f;
 
     private void Start()
     { 
