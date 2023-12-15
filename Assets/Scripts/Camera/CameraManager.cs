@@ -31,7 +31,18 @@ public class CameraManager : Singleton<CameraManager>
         // Early discards if the race has not started yet
         if (m_players == null || m_players.Count == 0 || !m_raceStarted)
         {
+            m_trackedDolly.m_XDamping = 1f;
+            m_trackedDolly.m_YDamping = 1f;
+            m_trackedDolly.m_ZDamping = 1f;
+            m_trackedDolly.m_PathOffset = new Vector3(0f, 10f, 0f);
             return;
+        }
+        else
+        {
+            m_trackedDolly.m_XDamping = 5.0f;
+            m_trackedDolly.m_YDamping = 5.0f;
+            m_trackedDolly.m_ZDamping = 5.0f;
+            m_trackedDolly.m_PathOffset = new Vector3(0f, 4f, 0f);
         }
 
         // Make the dolly camera follow the leader player

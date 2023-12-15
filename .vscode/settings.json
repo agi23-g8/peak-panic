@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "PeakPanic.sln"
+    "dotnet.defaultSolution": "peak-panic.sln"
 }

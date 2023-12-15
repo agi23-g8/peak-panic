@@ -173,6 +173,7 @@ public class ServerManager : Singleton<ServerManager>
         }
     }
 
+
     private void OnClientDisconnected(ulong clientID)
     {
         Debug.Log("Client disconnected: " + clientID);
