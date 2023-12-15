@@ -41,10 +41,7 @@ public class SnowCanon : MonoBehaviour
         if (snowballRigidbody != null)
         {
             // Appliquer une vélocité à la boule de neige dans la direction du canon
-            snowballRigidbody.velocity = -transform.up * initialSpeed;
-
-            // Applique un offset sur la position pour qu'elle se génère au niveau du canon
-            snowballRigidbody.position += Vector3.up * 4.8f;
+            snowballRigidbody.velocity = transform.up * initialSpeed;
         }
         else
         {
