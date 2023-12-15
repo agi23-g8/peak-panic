@@ -174,4 +174,4 @@ MonoBehaviour:
   minimalSpeed: 1
   slowForce: 20
   slowDuration: 3
-  lifeTime: 30
+  lifeTime: 24

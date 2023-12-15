@@ -122,7 +122,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   snowballPrefab: {fileID: 3165702408517328564, guid: 66bc3995e4c1f6a0886ac3eecc59910e,
     type: 3}
-  launchInterval: 3
+  launchInterval: 5
   minInitialSpeed: 15
   maxInitialSpeed: 30
 --- !u!1 &5156440877108574410
