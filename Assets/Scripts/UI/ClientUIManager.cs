@@ -86,18 +86,10 @@ public class ClientUIManager : Singleton<ClientUIManager>
             return;
         }
 
-        // make sure name is alphanumeric
-        if (!System.Text.RegularExpressions.Regex.IsMatch(name, @"^[a-zA-Z0-9]+$"))
+        if (name.Length > 12)
         {
-            messagePopup.Show("Invalid name, letters and numbers only", messagePopupDuration);
-            Debug.Log("Name must be alphanumeric!");
-            return;
-        }
-
-        if (name.Length > 10)
-        {
-            messagePopup.Show("Name must be 10 characters or less", messagePopupDuration);
-            Debug.Log("Name must be 10 characters or less!");
+            messagePopup.Show("Name must be 12 characters or less", messagePopupDuration);
+            Debug.Log("Name must be 12 characters or less!");
             return;
         }
 

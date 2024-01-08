@@ -20,7 +20,7 @@ public class SnowBall : MonoBehaviour
     private Renderer triggerRenderer;
     private float timer = 0f;
 
-    public float lifeTime = 10f;
+    public float lifeTime = 20f;
 
     private void Start()
     { 
@@ -64,7 +64,7 @@ public class SnowBall : MonoBehaviour
 
                 // Now compensate for the fact that the ball is growing in size by moving it back towards the center of the cube
                 Vector3 compensation = currentNormal * growingFactorSize;
-                transform.position += compensation;
+                rb.MovePosition(transform.position + compensation);
             }
         }
     }
