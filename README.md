@@ -47,10 +47,9 @@ All problems are fixed by restarting.
 
 * Huawei phones are usually not compatible.
 * Must support WebGL v2.
-* It does not matter if the UI goes back to main menu, you can still play. This happens sometimes.
 * The disconnect button on WebGL client does not always work. Refresh instead.
 
-## 🏅 Credits 
+## 🏅 Credits
 
 * [David Åsberg](https://github.com/davidasberg)
 * [Anders Blomqvist](https://github.com/andersblomqvist)
