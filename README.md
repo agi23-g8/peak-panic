@@ -6,7 +6,9 @@ A player is eliminated when going outside of view of the camera. The slope is fi
 
 This project was created during the second half of the [DH2413](https://www.kth.se/student/kurser/kurs/DH2413?l=en) course at KTH during 2023.
 
-## How to play 🎮
+For more information, please visit our site [https://agi23-g8.github.io/](https://agi23-g8.github.io/)
+
+## 🎮 How to play
 
 ### For host
 
@@ -24,12 +26,12 @@ This project was created during the second half of the [DH2413](https://www.kth.
 4. Enter a name and the game code
 5. Click connect
 
-### Good to know 💡
+### 💡 Good to know
 
 * Do not lock your phone! Either don't have auto screen lock or simply hold a finger on the screen as you play.
 * Lock the phone rotation so it does not switch between portrait and landscape mode!
 
-## Troubleshooting 🛠️
+## 🛠️ Troubleshooting
 
 All problems are fixed by restarting.
 
@@ -48,7 +50,7 @@ All problems are fixed by restarting.
 * It does not matter if the UI goes back to main menu, you can still play. This happens sometimes.
 * The disconnect button on WebGL client does not always work. Refresh instead.
 
-## Credits 🏅
+## 🏅 Credits 
 
 * [David Åsberg](https://github.com/davidasberg)
 * [Anders Blomqvist](https://github.com/andersblomqvist)
