@@ -1,12 +1,12 @@
 # Peak Panic
 
-A local multiplayer skiing game where you have keep up the pace so you don't fall behind! Each player control their character through their phone by tilting it left and right.
+Peak Panic is a local multiplayer skiing game where you have to keep up the pace so you don't fall behind! Each player controls a character through their own phone by tilting it left and right.
 
-A player is eliminated when going outside of view of the camera. The slope is filled with obstacles such as trees and rolling snow balls that you have to avoid. Additionally, there are speed boosts which each player can pick up in order to gain an advantage.
+A player is eliminated when going out of view of the camera. The camera will follow the leading player with a slight delay for letting players behind catch up. The slope is filled with obstacles such as trees and rolling snowballs that you have to avoid. Additionally, there are speed boosts placed around the slope that a player can pick up in order to gain an advantage. Let the fastest skier win!
 
 This project was created during the second half of the [DH2413](https://www.kth.se/student/kurser/kurs/DH2413?l=en) course at KTH during 2023.
 
-For more information, please visit our site [https://agi23-g8.github.io/](https://agi23-g8.github.io/)
+For more information, pictures and videos, please visit our site [https://agi23-g8.github.io/](https://agi23-g8.github.io/)
 
 ## 🎮 How to play
 
@@ -54,5 +54,5 @@ All problems are fixed by restarting.
 * [David Åsberg](https://github.com/davidasberg)
 * [Anders Blomqvist](https://github.com/andersblomqvist)
 * [Gabriel Françon](https://github.com/GabFrancon)
-* [Jeremy-Carneau](https://github.com/Jeremy-Carneau)
+* [Jeremy Carneau](https://github.com/Jeremy-Carneau)
 * [Jean-Louis Werthe](https://github.com/werthejl)
