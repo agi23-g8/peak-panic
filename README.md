@@ -68,6 +68,8 @@ Unity version: `2022.3.10f1`
 
 The WebGL client is hosted through the [Peak Panic repo](https://github.com/agi23-g8/peak-panic), where the built WebGL version lies in the `./docs` folder.
 
+The `main` scene has to be included for networking purposes. Otherwise, the client will not be able to communicate to the server.
+
 ## 🏅 Credits
 
 * [David Åsberg](https://github.com/davidasberg)
