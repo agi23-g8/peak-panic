@@ -49,6 +49,25 @@ All problems are fixed by restarting.
 * Must support WebGL v2.
 * The disconnect button on WebGL client does not always work. Refresh instead.
 
+## 🔨 Building
+
+Unity version: `2022.3.10f1`
+
+### Peak Panic Game
+
+1. Set platform to `Windows, Mac, Linux`
+2. Include all scenes and set `title-screen` as index `0`
+3. Build the game
+
+### WebGL client
+
+1. Set platform to `WebGL`
+2. Only include `webgl-client` and `main` scene
+3. Set `webgl-client` as index `0`
+4. Build
+
+The WebGL client is hosted through the [Peak Panic repo](https://github.com/agi23-g8/peak-panic), where the built WebGL version lies in the `./docs` folder.
+
 ## 🏅 Credits
 
 * [David Åsberg](https://github.com/davidasberg)
